@@ -28,7 +28,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
     return (
         <>
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                     {/* Left Column - Images */}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
@@ -37,7 +37,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                     >
                         {/* Main Image */}
                         <div
-                            className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden mb-4 cursor-pointer group"
+                            className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-4 cursor-pointer group"
                             onClick={() => setShowLightbox(true)}
                         >
                             <Image
@@ -48,8 +48,8 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                 priority
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-4 py-2 rounded-lg">
-                                    Klik untuk perbesar
+                                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-4 py-2 rounded-lg text-sm md:text-base">
+                                    Click to enlarge
                                 </span>
                             </div>
                         </div>
@@ -60,9 +60,9 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                 <button
                                     key={index}
                                     onClick={() => setSelectedImage(index)}
-                                    className={`relative h-20 rounded-lg overflow-hidden ${selectedImage === index
-                                            ? 'ring-4 ring-sage'
-                                            : 'ring-2 ring-transparent hover:ring-sage/50'
+                                    className={`relative h-16 md:h-20 rounded-lg overflow-hidden ${selectedImage === index
+                                        ? 'ring-4 ring-sage'
+                                        : 'ring-2 ring-transparent hover:ring-sage/50'
                                         } transition-all`}
                                 >
                                     <Image
@@ -83,52 +83,52 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                         transition={{ duration: 0.6 }}
                     >
                         {/* Villa Info */}
-                        <div className="mb-8">
-                            <h1 className="text-4xl md:text-5xl font-bold text-olive mb-4">
+                        <div className="mb-6 md:mb-8">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-olive mb-3 md:mb-4">
                                 {villa.name}
                             </h1>
 
-                            <div className="flex items-center text-gray-600 mb-6">
-                                <MapPin size={20} className="text-sage mr-2" />
-                                <span>{villa.location}</span>
+                            <div className="flex items-center text-gray-600 mb-4 md:mb-6">
+                                <MapPin size={18} className="text-sage mr-2 flex-shrink-0" />
+                                <span className="text-sm md:text-base">{villa.location}</span>
                             </div>
 
-                            <div className="flex items-center space-x-6 mb-6 text-lg">
+                            <div className="flex flex-wrap items-center gap-3 md:gap-6 mb-4 md:mb-6">
                                 <div className="flex items-center space-x-2">
-                                    <Bed size={24} className="text-sage" />
-                                    <span className="text-olive">{villa.bedrooms} Kamar</span>
+                                    <Bed size={20} className="text-sage md:w-6 md:h-6" />
+                                    <span className="text-olive text-sm md:text-lg">{villa.bedrooms} Bedroom{villa.bedrooms > 1 ? 's' : ''}</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <Bath size={24} className="text-sage" />
-                                    <span className="text-olive">{villa.bathrooms} Kamar Mandi</span>
+                                    <Bath size={20} className="text-sage md:w-6 md:h-6" />
+                                    <span className="text-olive text-sm md:text-lg">{villa.bathrooms} Bathroom{villa.bathrooms > 1 ? 's' : ''}</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <Users size={24} className="text-sage" />
-                                    <span className="text-olive">Maks {villa.max_guests} Tamu</span>
+                                    <Users size={20} className="text-sage md:w-6 md:h-6" />
+                                    <span className="text-olive text-sm md:text-lg">Max {villa.max_guests} Guests</span>
                                 </div>
                             </div>
 
-                            <div className="mb-6">
-                                <span className="text-4xl font-bold text-sage">
+                            <div className="mb-4 md:mb-6">
+                                <span className="text-2xl md:text-4xl font-bold text-sage">
                                     {formatCurrency(villa.price_per_night)}
                                 </span>
-                                <span className="text-gray-600 text-xl"> / malam</span>
+                                <span className="text-gray-600 text-base md:text-xl"> / night</span>
                             </div>
 
-                            <p className="text-gray-700 text-lg leading-relaxed mb-8">
+                            <p className="text-gray-700 text-sm md:text-lg leading-relaxed mb-6 md:mb-8">
                                 {villa.description}
                             </p>
 
                             {/* Amenities */}
-                            <div className="mb-8">
-                                <h3 className="text-2xl font-semibold text-olive mb-4">Fasilitas</h3>
-                                <div className="grid grid-cols-2 gap-3">
+                            <div className="mb-6 md:mb-8">
+                                <h3 className="text-xl md:text-2xl font-semibold text-olive mb-3 md:mb-4">Amenities</h3>
+                                <div className="grid grid-cols-2 gap-2 md:gap-3">
                                     {villa.amenities.map((amenity, index) => (
                                         <div key={index} className="flex items-center space-x-2">
-                                            <div className="flex-shrink-0 w-6 h-6 bg-sage/20 rounded-full flex items-center justify-center">
-                                                <Check size={16} className="text-sage" />
+                                            <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-sage/20 rounded-full flex items-center justify-center">
+                                                <Check size={12} className="text-sage md:w-4 md:h-4" />
                                             </div>
-                                            <span className="text-gray-700">{amenity}</span>
+                                            <span className="text-gray-700 text-sm md:text-base">{amenity}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -140,26 +140,26 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-gradient-to-br from-sage to-sage-dark rounded-2xl p-6 text-white sticky top-24"
+                            className="bg-gradient-to-br from-sage to-sage-dark rounded-xl md:rounded-2xl p-4 md:p-6 text-white lg:sticky lg:top-24"
                         >
-                            <div className="text-center mb-6">
-                                <p className="text-white/80 mb-1">Mulai dari</p>
-                                <p className="text-3xl font-bold">{formatCurrency(villa.price_per_night)}</p>
-                                <p className="text-white/80">per malam</p>
+                            <div className="text-center mb-4 md:mb-6">
+                                <p className="text-white/80 mb-1 text-sm md:text-base">Starting from</p>
+                                <p className="text-2xl md:text-3xl font-bold">{formatCurrency(villa.price_per_night)}</p>
+                                <p className="text-white/80 text-sm md:text-base">per night</p>
                             </div>
 
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowBookingModal(true)}
-                                className="w-full bg-white text-sage py-4 rounded-xl font-bold text-lg hover:bg-cream transition-colors flex items-center justify-center space-x-2 shadow-lg"
+                                className="w-full bg-white text-sage py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-base md:text-lg hover:bg-cream transition-colors flex items-center justify-center space-x-2 shadow-lg"
                             >
-                                <Calendar size={24} />
-                                <span>Pesan Sekarang</span>
+                                <Calendar size={20} className="md:w-6 md:h-6" />
+                                <span>Book Now</span>
                             </motion.button>
 
-                            <p className="text-center text-white/70 text-sm mt-4">
-                                Gratis pembatalan dalam 24 jam
+                            <p className="text-center text-white/70 text-xs md:text-sm mt-3 md:mt-4">
+                                Free cancellation within 24 hours
                             </p>
                         </motion.div>
                     </motion.div>
@@ -179,7 +179,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                 onClick={() => setShowLightbox(false)}
                                 className="absolute top-4 right-4 text-white hover:text-sage transition-colors z-10"
                             >
-                                <X size={32} />
+                                <X size={28} className="md:w-8 md:h-8" />
                             </button>
 
                             <button
@@ -187,9 +187,9 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                     e.stopPropagation()
                                     prevImage()
                                 }}
-                                className="absolute left-4 text-white hover:text-sage transition-colors"
+                                className="absolute left-2 md:left-4 text-white hover:text-sage transition-colors"
                             >
-                                <ChevronLeft size={48} />
+                                <ChevronLeft size={36} className="md:w-12 md:h-12" />
                             </button>
 
                             <button
@@ -197,13 +197,13 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                     e.stopPropagation()
                                     nextImage()
                                 }}
-                                className="absolute right-4 text-white hover:text-sage transition-colors"
+                                className="absolute right-2 md:right-4 text-white hover:text-sage transition-colors"
                             >
-                                <ChevronRight size={48} />
+                                <ChevronRight size={36} className="md:w-12 md:h-12" />
                             </button>
 
                             <div
-                                className="relative w-full max-w-5xl h-[80vh]"
+                                className="relative w-full max-w-5xl h-[60vh] md:h-[80vh]"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <Image
@@ -214,7 +214,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                 />
                             </div>
 
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-lg">
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-base md:text-lg">
                                 {selectedImage + 1} / {villa.images.length}
                             </div>
                         </motion.div>
@@ -229,7 +229,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto"
+                        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
                         onClick={() => setShowBookingModal(false)}
                     >
                         <motion.div
@@ -237,7 +237,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="my-8"
+                            className="my-4 md:my-8 w-full max-w-2xl"
                         >
                             <ModernBookingFlow
                                 villa={villa}
