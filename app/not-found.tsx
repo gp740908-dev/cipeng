@@ -1,36 +1,22 @@
-'use client'
-
 import Link from 'next/link'
-import { Home, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export default function NotFound() {
     return (
-        <div className="min-h-screen bg-gradient-to-b from-cream to-sage-light/20 flex items-center justify-center p-4">
+        <main className="min-h-screen bg-cream flex items-center justify-center px-6">
             <div className="text-center">
-                <h1 className="font-knewave text-6xl md:text-8xl text-sage mb-4">404</h1>
-                <h2 className="text-3xl md:text-4xl font-bold text-olive mb-4">
-                    Page Not Found
-                </h2>
-                <p className="text-xl text-gray-600 mb-8 max-w-md">
-                    Oops! The page you're looking for seems to have wandered off into the rice fields.
+                <h1 className="font-display text-display-xl text-primary mb-4">404</h1>
+                <p className="text-muted text-lg mb-8">
+                    The page you're looking for doesn't exist.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center space-x-2 bg-sage text-white px-6 py-3 rounded-lg hover:bg-sage-dark transition-all font-medium"
-                    >
-                        <Home size={20} />
-                        <span>Go Home</span>
-                    </Link>
-                    <button
-                        onClick={() => window.history.back()}
-                        className="inline-flex items-center space-x-2 border-2 border-sage text-sage px-6 py-3 rounded-lg hover:bg-sage hover:text-white transition-all font-medium"
-                    >
-                        <ArrowLeft size={20} />
-                        <span>Go Back</span>
-                    </button>
-                </div>
+                <Link
+                    href="/"
+                    className="inline-flex items-center gap-3 text-primary text-sm tracking-[0.2em] uppercase group"
+                >
+                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                    <span>Back to Home</span>
+                </Link>
             </div>
-        </div>
+        </main>
     )
 }

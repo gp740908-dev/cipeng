@@ -1,11 +1,11 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
-import { ChevronRight, Home } from 'lucide-react'
-import { useRef } from 'react'
+import { ChevronRight } from 'lucide-react'
 
-interface Breadcrumb {
+interface BreadcrumbItem {
     label: string
     href?: string
 }
@@ -14,7 +14,7 @@ interface PageHeaderProps {
     title: string
     subtitle?: string
     backgroundImage?: string
-    breadcrumbs?: Breadcrumb[]
+    breadcrumbs?: BreadcrumbItem[]
     overlay?: 'light' | 'dark' | 'gradient'
     height?: 'small' | 'medium' | 'large'
 }
@@ -22,159 +22,112 @@ interface PageHeaderProps {
 export default function PageHeader({
     title,
     subtitle,
-    backgroundImage = 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1920&q=80',
+    backgroundImage = 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80',
     breadcrumbs = [],
-    overlay = 'gradient',
+    overlay = 'dark',
     height = 'medium'
 }: PageHeaderProps) {
-    const ref = useRef<HTMLDivElement>(null)
+    const ref = useRef<HTMLElement>(null)
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ["start start", "end start"]
     })
 
-    const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+    const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
     const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+    const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1])
 
     const heightClasses = {
-        small: 'h-[280px] md:h-[320px]',
-        medium: 'h-[350px] md:h-[420px]',
-        large: 'h-[450px] md:h-[520px]'
-    }
-
-    const overlayClasses = {
-        light: 'bg-white/30',
-        dark: 'bg-black/50',
-        gradient: 'bg-gradient-to-b from-black/60 via-black/40 to-cream'
+        small: 'h-[50vh] min-h-[400px]',
+        medium: 'h-[65vh] min-h-[500px]',
+        large: 'h-[80vh] min-h-[600px]'
     }
 
     return (
-        <div ref={ref} className={`relative ${heightClasses[height]} overflow-hidden`}>
+        <header ref={ref} className={`relative ${heightClasses[height]} overflow-hidden bg-primary`}>
             {/* Parallax Background */}
             <motion.div
-                style={{ y }}
-                className="absolute inset-0 w-full h-[130%]"
+                style={{ y: backgroundY, scale }}
+                className="absolute inset-0 w-full h-[120%] -top-[10%]"
             >
                 <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${backgroundImage})` }}
                 />
+                <div className="absolute inset-0 bg-primary/50" />
             </motion.div>
-
-            {/* Overlay */}
-            <div className={`absolute inset-0 ${overlayClasses[overlay]}`} />
-
-            {/* Decorative Elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 0.1, scale: 1 }}
-                    transition={{ duration: 1.5, delay: 0.5 }}
-                    className="absolute -top-20 -right-20 w-80 h-80 bg-sage rounded-full blur-3xl"
-                />
-                <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 0.08, scale: 1 }}
-                    transition={{ duration: 1.5, delay: 0.7 }}
-                    className="absolute -bottom-20 -left-20 w-60 h-60 bg-sage-light rounded-full blur-3xl"
-                />
-            </div>
 
             {/* Content */}
             <motion.div
                 style={{ opacity }}
-                className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center items-center text-center"
+                className="relative z-10 h-full flex flex-col justify-end px-6 md:px-12 pb-16 md:pb-24"
             >
-                {/* Breadcrumbs */}
-                {breadcrumbs.length > 0 && (
-                    <motion.nav
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="mb-6"
-                        aria-label="Breadcrumb"
-                    >
-                        <ol className="flex items-center justify-center flex-wrap gap-2 text-sm">
-                            <li>
-                                <Link
-                                    href="/"
-                                    className="flex items-center text-white/80 hover:text-sage-light transition-colors"
-                                >
-                                    <Home size={16} className="mr-1" />
-                                    <span>Home</span>
-                                </Link>
-                            </li>
-                            {breadcrumbs.map((crumb, index) => (
-                                <li key={index} className="flex items-center">
-                                    <ChevronRight size={16} className="text-white/50 mx-1" />
-                                    {crumb.href ? (
-                                        <Link
-                                            href={crumb.href}
-                                            className="text-white/80 hover:text-sage-light transition-colors"
-                                        >
-                                            {crumb.label}
+                <div className="max-w-[1400px] mx-auto w-full">
+                    {/* Breadcrumbs */}
+                    {breadcrumbs.length > 0 && (
+                        <motion.nav
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="flex items-center gap-2 text-sm text-white/60 mb-8"
+                        >
+                            <Link href="/" className="hover:text-white transition-colors">
+                                Home
+                            </Link>
+                            {breadcrumbs.map((item, index) => (
+                                <span key={index} className="flex items-center gap-2">
+                                    <ChevronRight size={14} />
+                                    {item.href ? (
+                                        <Link href={item.href} className="hover:text-white transition-colors">
+                                            {item.label}
                                         </Link>
                                     ) : (
-                                        <span className="text-sage-light font-medium">
-                                            {crumb.label}
-                                        </span>
+                                        <span className="text-white">{item.label}</span>
                                     )}
-                                </li>
+                                </span>
                             ))}
-                        </ol>
-                    </motion.nav>
-                )}
+                        </motion.nav>
+                    )}
 
-                {/* Title */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                    className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4"
-                >
-                    <span className="relative">
-                        {title}
-                        <motion.span
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 0.8, delay: 0.8 }}
-                            className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-sage to-sage-light rounded-full"
-                        />
-                    </span>
-                </motion.h1>
+                    {/* Title */}
+                    <div className="overflow-hidden">
+                        <motion.h1
+                            initial={{ y: 100 }}
+                            animate={{ y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="font-display text-display-xl text-white mb-6"
+                        >
+                            {title}
+                        </motion.h1>
+                    </div>
 
-                {/* Subtitle */}
-                {subtitle && (
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.5 }}
-                        className="text-lg md:text-xl text-white/90 max-w-2xl"
-                    >
-                        {subtitle}
-                    </motion.p>
-                )}
+                    {/* Subtitle */}
+                    {subtitle && (
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                            className="text-white/70 text-lg md:text-xl max-w-2xl"
+                        >
+                            {subtitle}
+                        </motion.p>
+                    )}
+                </div>
             </motion.div>
 
-            {/* Bottom Wave */}
-            <div className="absolute bottom-0 left-0 right-0">
-                <svg
-                    viewBox="0 0 1440 60"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-auto"
-                    preserveAspectRatio="none"
-                >
-                    <path
-                        d="M0 60V30C240 10 480 0 720 10C960 20 1200 40 1440 30V60H0Z"
-                        className="fill-cream/30"
-                    />
-                    <path
-                        d="M0 60V40C360 20 720 10 1080 20C1260 25 1380 35 1440 40V60H0Z"
-                        className="fill-cream"
-                    />
-                </svg>
-            </div>
-        </div>
+            {/* Scroll Line */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1 }}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+            >
+                <motion.div
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-px h-12 bg-gradient-to-b from-white/0 via-white/50 to-white/0"
+                />
+            </motion.div>
+        </header>
     )
 }

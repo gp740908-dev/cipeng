@@ -7,20 +7,20 @@ import BackToTop from '@/components/BackToTop'
 import AboutContent from '@/components/about/AboutContent'
 
 export const metadata: Metadata = {
-    title: 'About Us - StayinUBUD | Luxury Villa Rentals in Ubud',
+    title: 'About Us - StayinUBUD | Our Story',
     description: 'Learn about StayinUBUD\'s story, our mission to provide exceptional villa experiences in Ubud, Bali, and meet the team behind our luxury properties.',
 }
 
 export default function AboutPage() {
     return (
-        <main className="min-h-screen bg-cream/30">
+        <main className="min-h-screen bg-cream">
             <Navbar />
             <PageHeader
                 title="About Us"
-                subtitle="Discover the story behind StayinUBUD and our passion for creating unforgettable Balinese experiences"
+                subtitle="A decade of curating exceptional experiences in the heart of Ubud"
                 backgroundImage="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=1920&q=80"
-                breadcrumbs={[{ label: 'About Us' }]}
-                height="large"
+                breadcrumbs={[{ label: 'About' }]}
+                height="medium"
             />
             <AboutContent />
             <Footer />

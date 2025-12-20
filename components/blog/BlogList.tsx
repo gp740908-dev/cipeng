@@ -4,11 +4,10 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, User, ArrowRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { BlogPost } from '@/types'
 import { format, parseISO } from 'date-fns'
-import { id } from 'date-fns/locale'
 
 export default function BlogList() {
     const supabase = createClient()
@@ -20,86 +19,85 @@ export default function BlogList() {
     }, [])
 
     async function fetchPosts() {
-        try {
-            const { data, error } = await supabase
-                .from('blog_posts')
-                .select('*')
-                .eq('published', true)
-                .order('created_at', { ascending: false })
+        const { data, error } = await supabase
+            .from('blog_posts')
+            .select('*')
+            .eq('published', true)
+            .order('created_at', { ascending: false })
 
-            if (error) throw error
-            setPosts(data || [])
-        } catch (error) {
-            console.error('Error fetching posts:', error)
-        } finally {
-            setLoading(false)
+        if (!error && data) {
+            setPosts(data)
         }
+        setLoading(false)
     }
 
     if (loading) {
         return (
-            <div className="container mx-auto px-4">
-                <div className="text-center py-20">
-                    <div className="animate-spin w-12 h-12 border-4 border-sage border-t-transparent rounded-full mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Memuat artikel...</p>
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="space-y-4">
+                            <div className="aspect-[4/3] bg-light animate-pulse" />
+                            <div className="h-6 bg-light animate-pulse w-3/4" />
+                            <div className="h-4 bg-light animate-pulse w-1/2" />
+                        </div>
+                    ))}
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="container mx-auto px-4">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
             {posts.length === 0 ? (
-                <div className="text-center py-20">
-                    <p className="text-gray-600">Belum ada artikel</p>
+                <div className="text-center py-24">
+                    <p className="text-muted text-lg">No articles available yet.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
                     {posts.map((post, index) => (
                         <motion.article
                             key={post.id}
                             initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition-shadow"
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: index * 0.1 }}
+                            className="group"
                         >
-                            {post.cover_image && (
-                                <Link href={`/blog/${post.slug}`} className="block relative h-48 overflow-hidden">
-                                    <Image
-                                        src={post.cover_image}
-                                        alt={post.title}
-                                        fill
-                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                    />
-                                </Link>
-                            )}
-                            <div className="p-6">
-                                <div className="flex items-center text-sm text-gray-500 mb-3 space-x-4">
-                                    <span className="flex items-center">
-                                        <Calendar size={14} className="mr-1" />
-                                        {format(parseISO(post.created_at), 'dd MMM yyyy', { locale: id })}
-                                    </span>
-                                    <span className="flex items-center">
-                                        <User size={14} className="mr-1" />
-                                        {post.author}
-                                    </span>
+                            <Link href={`/blog/${post.slug}`} className="block">
+                                {/* Image */}
+                                <div className="aspect-[4/3] relative overflow-hidden bg-light mb-6">
+                                    {post.cover_image && (
+                                        <Image
+                                            src={post.cover_image}
+                                            alt={post.title}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
+                                    )}
+                                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-all duration-500" />
+
+                                    {/* Arrow */}
+                                    <div className="absolute top-4 right-4 w-10 h-10 bg-white/0 group-hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                        <ArrowUpRight size={18} className="text-primary" />
+                                    </div>
                                 </div>
-                                <Link href={`/blog/${post.slug}`}>
-                                    <h2 className="text-xl font-bold text-olive mb-3 group-hover:text-sage transition-colors line-clamp-2">
+
+                                {/* Content */}
+                                <div className="space-y-3">
+                                    <p className="text-muted text-sm">
+                                        {format(parseISO(post.created_at), 'MMMM d, yyyy')}
+                                    </p>
+                                    <h3 className="font-display text-2xl text-primary group-hover:text-accent transition-colors leading-tight">
                                         {post.title}
-                                    </h2>
-                                </Link>
-                                {post.excerpt && (
-                                    <p className="text-gray-600 line-clamp-3 mb-4">{post.excerpt}</p>
-                                )}
-                                <Link
-                                    href={`/blog/${post.slug}`}
-                                    className="inline-flex items-center text-sage font-medium hover:text-sage-dark transition-colors"
-                                >
-                                    Baca Selengkapnya
-                                    <ArrowRight size={18} className="ml-1" />
-                                </Link>
-                            </div>
+                                    </h3>
+                                    {post.excerpt && (
+                                        <p className="text-muted line-clamp-2">
+                                            {post.excerpt}
+                                        </p>
+                                    )}
+                                </div>
+                            </Link>
                         </motion.article>
                     ))}
                 </div>

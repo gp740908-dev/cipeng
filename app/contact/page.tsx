@@ -8,19 +8,19 @@ import ContactContent from '@/components/contact/ContactContent'
 
 export const metadata: Metadata = {
     title: 'Contact Us - StayinUBUD | Get in Touch',
-    description: 'Have questions about our villas or need help with your booking? Contact StayinUBUD through our form, WhatsApp, or visit our office in Ubud, Bali.',
+    description: 'Have questions about our villas or need help with your booking? Contact StayinUBUD and let us help plan your perfect Balinese escape.',
 }
 
 export default function ContactPage() {
     return (
-        <main className="min-h-screen bg-cream/30">
+        <main className="min-h-screen bg-cream">
             <Navbar />
             <PageHeader
-                title="Contact Us"
-                subtitle="We're here to help make your Ubud stay extraordinary"
+                title="Contact"
+                subtitle="We're here to help create your perfect Balinese experience"
                 backgroundImage="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1920&q=80"
                 breadcrumbs={[{ label: 'Contact' }]}
-                height="medium"
+                height="small"
             />
             <ContactContent />
             <Footer />

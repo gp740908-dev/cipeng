@@ -1,77 +1,76 @@
 'use client'
 
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
 import Link from 'next/link'
-import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear()
+    const ref = useRef(null)
+    const isInView = useInView(ref, { once: true, margin: "-50px" })
 
-    const footerLinks = {
+    const links = {
         explore: [
-            { label: 'Home', href: '/' },
-            { label: 'Villas', href: '/villas' },
+            { label: 'All Villas', href: '/villas' },
             { label: 'About Us', href: '/about' },
+            { label: 'Journal', href: '/blog' },
             { label: 'Contact', href: '/contact' },
         ],
         legal: [
             { label: 'Privacy Policy', href: '/privacy' },
             { label: 'Terms of Service', href: '/terms' },
-            { label: 'Cancellation Policy', href: '/cancellation' },
+            { label: 'Booking Policy', href: '/booking-policy' },
+        ],
+        social: [
+            { label: 'Instagram', href: 'https://instagram.com' },
+            { label: 'Pinterest', href: 'https://pinterest.com' },
+            { label: 'LinkedIn', href: 'https://linkedin.com' },
         ],
     }
 
-    const socialLinks = [
-        { icon: Instagram, href: '#', label: 'Instagram' },
-        { icon: Facebook, href: '#', label: 'Facebook' },
-        { icon: Twitter, href: '#', label: 'Twitter' },
-    ]
-
     return (
-        <footer className="bg-olive text-cream">
-            <div className="container mx-auto px-4 py-12 md:py-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-                    {/* Brand Section */}
+        <footer ref={ref} className="bg-primary text-white">
+            {/* Main Footer */}
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                    {/* Brand */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.8 }}
+                        className="lg:col-span-5"
                     >
-                        <h2 className="font-knewave text-3xl text-sage mb-4">
-                            StayinUBUD
-                        </h2>
-                        <p className="text-cream/80 mb-4 text-sm">
-                            Experience luxury in the heart of Ubud. Premium villa rentals with authentic Balinese hospitality.
+                        <Link href="/" className="inline-block mb-8">
+                            <span className="font-display text-4xl">StayinUBUD</span>
+                        </Link>
+                        <p className="text-white/50 max-w-sm leading-relaxed mb-8">
+                            Curating exceptional villa experiences in Ubud, Bali.
+                            Where architectural excellence meets Balinese tranquility.
                         </p>
-                        <div className="flex space-x-4">
-                            {socialLinks.map((social) => (
-                                <a
-                                    key={social.label}
-                                    href={social.href}
-                                    aria-label={social.label}
-                                    className="p-2 rounded-full bg-sage/20 hover:bg-sage transition-colors smooth-transition"
-                                >
-                                    <social.icon size={18} />
-                                </a>
-                            ))}
-                        </div>
+                        <a
+                            href="mailto:hello@stayinubud.com"
+                            className="text-accent hover:text-accent-light transition-colors"
+                        >
+                            hello@stayinubud.com
+                        </a>
                     </motion.div>
 
-                    {/* Explore Links */}
+                    {/* Links */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.8, delay: 0.1 }}
+                        className="lg:col-span-2"
                     >
-                        <h3 className="font-semibold text-lg mb-4">Explore</h3>
-                        <ul className="space-y-2">
-                            {footerLinks.explore.map((link) => (
+                        <p className="text-white/30 text-sm tracking-[0.2em] uppercase mb-6">
+                            Explore
+                        </p>
+                        <ul className="space-y-4">
+                            {links.explore.map((link) => (
                                 <li key={link.href}>
                                     <Link
                                         href={link.href}
-                                        className="text-cream/80 hover:text-sage transition-colors text-sm"
+                                        className="text-white/70 hover:text-white transition-colors"
                                     >
                                         {link.label}
                                     </Link>
@@ -80,20 +79,21 @@ export default function Footer() {
                         </ul>
                     </motion.div>
 
-                    {/* Legal Links */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="lg:col-span-2"
                     >
-                        <h3 className="font-semibold text-lg mb-4">Legal</h3>
-                        <ul className="space-y-2">
-                            {footerLinks.legal.map((link) => (
+                        <p className="text-white/30 text-sm tracking-[0.2em] uppercase mb-6">
+                            Legal
+                        </p>
+                        <ul className="space-y-4">
+                            {links.legal.map((link) => (
                                 <li key={link.href}>
                                     <Link
                                         href={link.href}
-                                        className="text-cream/80 hover:text-sage transition-colors text-sm"
+                                        className="text-white/70 hover:text-white transition-colors"
                                     >
                                         {link.label}
                                     </Link>
@@ -102,51 +102,46 @@ export default function Footer() {
                         </ul>
                     </motion.div>
 
-                    {/* Contact Info */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={isInView ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="lg:col-span-3"
                     >
-                        <h3 className="font-semibold text-lg mb-4">Contact Us</h3>
-                        <ul className="space-y-3">
-                            <li className="flex items-start space-x-3 text-sm">
-                                <MapPin size={18} className="text-sage mt-1 flex-shrink-0" />
-                                <span className="text-cream/80">
-                                    Jalan Raya Ubud, Ubud,<br />Bali 80571, Indonesia
-                                </span>
-                            </li>
-                            <li className="flex items-center space-x-3 text-sm">
-                                <Phone size={18} className="text-sage flex-shrink-0" />
-                                <a
-                                    href="tel:+62361234567" className="text-cream/80 hover:text-sage transition-colors">
-                                    +62 361 234 567
-                                </a>
-                            </li>
-                            <li className="flex items-center space-x-3 text-sm">
-                                <Mail size={18} className="text-sage flex-shrink-0" />
-                                <a
-                                    href="mailto:info@stayinubud.com" className="text-cream/80 hover:text-sage transition-colors">
-                                    info@stayinubud.com
-                                </a>
-                            </li>
+                        <p className="text-white/30 text-sm tracking-[0.2em] uppercase mb-6">
+                            Connect
+                        </p>
+                        <ul className="space-y-4">
+                            {links.social.map((link) => (
+                                <li key={link.href}>
+                                    <a
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+                                    >
+                                        <span>{link.label}</span>
+                                        <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </a>
+                                </li>
+                            ))}
                         </ul>
                     </motion.div>
                 </div>
+            </div>
 
-                {/* Bottom Bar */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    className="mt-12 pt-8 border-t border-cream/20 text-center"
-                >
-                    <p className="text-cream/70 text-sm">
-                        &copy; {currentYear} StayinUBUD. All rights reserved. Built with ❤️ in Bali.
-                    </p>
-                </motion.div>
+            {/* Bottom Bar */}
+            <div className="border-t border-white/10">
+                <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-8">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <p className="text-white/40 text-sm">
+                            © {new Date().getFullYear()} StayinUBUD. All rights reserved.
+                        </p>
+                        <p className="text-white/40 text-sm">
+                            Ubud, Bali, Indonesia
+                        </p>
+                    </div>
+                </div>
             </div>
         </footer>
     )

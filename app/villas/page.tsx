@@ -7,22 +7,22 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import BackToTop from '@/components/BackToTop'
 
 export const metadata: Metadata = {
-    title: 'Our Villas - StayinUBUD',
-    description: 'Browse our collection of luxury villas in Ubud. Find your perfect retreat with private pools, rice field views, and premium amenities.',
+    title: 'Our Villas - StayinUBUD | Luxury Villa Collection',
+    description: 'Browse our curated collection of luxury villas in Ubud. Find your perfect retreat with private pools, rice field views, and premium amenities.',
 }
 
 export default function VillasPage() {
     return (
-        <main className="min-h-screen bg-cream/30">
+        <main className="min-h-screen bg-cream">
             <Navbar />
             <PageHeader
-                title="Our Villas"
-                subtitle="Discover your perfect sanctuary in the heart of Ubud"
+                title="Our Collection"
+                subtitle="Curated properties representing the pinnacle of Balinese architecture and hospitality"
                 backgroundImage="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
                 breadcrumbs={[{ label: 'Villas' }]}
                 height="medium"
             />
-            <section className="py-16">
+            <section className="py-24">
                 <VillasList />
             </section>
             <Footer />

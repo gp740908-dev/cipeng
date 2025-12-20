@@ -1,98 +1,68 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Bed, Bath, Users } from 'lucide-react'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
+import { ArrowUpRight } from 'lucide-react'
 
 interface VillaCardProps {
     villa: Villa
     index?: number
+    variant?: 'default' | 'featured' | 'compact'
 }
 
-export default function VillaCard({ villa, index = 0 }: VillaCardProps) {
+export default function VillaCard({ villa, index = 0, variant = 'default' }: VillaCardProps) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
+        <motion.article
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
             className="group"
         >
-            <div className="bg-white rounded-2xl overflow-hidden shadow-lg card-lift">
-                {/* Image */}
-                <div className="relative h-64 image-zoom-container">
+            <Link href={`/villas/${villa.id}`} className="block">
+                {/* Image Container */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-light mb-6">
                     <Image
                         src={villa.images[0]}
                         alt={villa.name}
                         fill
-                        className="object-cover image-zoom"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
                     />
-                    <div className="absolute top-4 right-4">
-                        <div className="bg-sage text-white px-3 py-1 rounded-full text-sm font-medium">
-                            {formatCurrency(villa.price_per_night)}/night
-                        </div>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-all duration-500" />
+
+                    {/* Arrow */}
+                    <div className="absolute top-4 right-4 w-10 h-10 bg-white/0 group-hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                        <ArrowUpRight size={18} className="text-primary" />
                     </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
-                    <h3 className="text-2xl font-semibold text-olive mb-2 group-hover:text-sage transition-colors">
-                        {villa.name}
-                    </h3>
-
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {villa.description}
-                    </p>
-
-                    {/* Features */}
-                    <div className="flex items-center space-x-4 mb-4 text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                            <Bed size={18} className="text-sage" />
-                            <span>{villa.bedrooms} Beds</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                            <Bath size={18} className="text-sage" />
-                            <span>{villa.bathrooms} Baths</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                            <Users size={18} className="text-sage" />
-                            <span>{villa.max_guests} Guests</span>
-                        </div>
+                <div className="space-y-2">
+                    <div className="flex items-baseline justify-between gap-4">
+                        <h3 className="font-display text-2xl text-primary group-hover:text-accent transition-colors">
+                            {villa.name}
+                        </h3>
+                        <span className="text-muted text-sm whitespace-nowrap">
+                            {villa.bedrooms} BR
+                        </span>
                     </div>
 
-                    {/* Amenities */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {villa.amenities.slice(0, 3).map((amenity) => (
-                            <span
-                                key={amenity}
-                                className="text-xs bg-cream text-olive px-2 py-1 rounded-full"
-                            >
-                                {amenity}
-                            </span>
-                        ))}
-                        {villa.amenities.length > 3 && (
-                            <span className="text-xs bg-cream text-olive px-2 py-1 rounded-full">
-                                +{villa.amenities.length - 3} more
-                            </span>
-                        )}
+                    <div className="flex items-center justify-between">
+                        <p className="text-muted text-sm">
+                            {villa.max_guests} Guests · {villa.bathrooms} Bath
+                        </p>
+                        <p className="text-primary font-medium">
+                            {formatCurrency(villa.price_per_night)}
+                            <span className="text-muted font-normal text-sm">/night</span>
+                        </p>
                     </div>
-
-                    {/* Button */}
-                    <Link href={`/villas/${villa.id}`}>
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full bg-sage text-white py-3 rounded-lg font-medium hover:bg-sage-dark transition-colors btn-ripple"
-                        >
-                            View Details
-                        </motion.button>
-                    </Link>
                 </div>
-            </div>
-        </motion.div>
+            </Link>
+        </motion.article>
     )
 }

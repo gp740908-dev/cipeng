@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import ModernBookingFlow from '@/components/ModernBookingFlow'
@@ -27,226 +28,246 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
 
     return (
         <>
-            <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                    {/* Left Column - Images */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                {/* Back Link */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-12"
+                >
+                    <Link
+                        href="/villas"
+                        className="inline-flex items-center gap-2 text-muted hover:text-primary transition-colors text-sm tracking-wide"
                     >
-                        {/* Main Image */}
-                        <div
-                            className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-4 cursor-pointer group"
-                            onClick={() => setShowLightbox(true)}
-                        >
-                            <Image
-                                src={villa.images[selectedImage]}
-                                alt={`${villa.name} - Image ${selectedImage + 1}`}
-                                fill
-                                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                priority
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 px-4 py-2 rounded-lg text-sm md:text-base">
-                                    Click to enlarge
-                                </span>
-                            </div>
-                        </div>
+                        <ArrowLeft size={16} />
+                        <span>Back to Collection</span>
+                    </Link>
+                </motion.div>
 
-                        {/* Thumbnail Grid */}
-                        <div className="grid grid-cols-4 gap-2">
-                            {villa.images.map((image, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedImage(index)}
-                                    className={`relative h-16 md:h-20 rounded-lg overflow-hidden ${selectedImage === index
-                                        ? 'ring-4 ring-sage'
-                                        : 'ring-2 ring-transparent hover:ring-sage/50'
-                                        } transition-all`}
-                                >
-                                    <Image
-                                        src={image}
-                                        alt={`${villa.name} thumbnail ${index + 1}`}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </button>
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* Right Column - Details */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        {/* Villa Info */}
-                        <div className="mb-6 md:mb-8">
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-olive mb-3 md:mb-4">
+                {/* Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="mb-12"
+                >
+                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                        <div>
+                            <h1 className="font-display text-display-md text-primary mb-4">
                                 {villa.name}
                             </h1>
-
-                            <div className="flex items-center text-gray-600 mb-4 md:mb-6">
-                                <MapPin size={18} className="text-sage mr-2 flex-shrink-0" />
-                                <span className="text-sm md:text-base">{villa.location}</span>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-3 md:gap-6 mb-4 md:mb-6">
-                                <div className="flex items-center space-x-2">
-                                    <Bed size={20} className="text-sage md:w-6 md:h-6" />
-                                    <span className="text-olive text-sm md:text-lg">{villa.bedrooms} Bedroom{villa.bedrooms > 1 ? 's' : ''}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Bath size={20} className="text-sage md:w-6 md:h-6" />
-                                    <span className="text-olive text-sm md:text-lg">{villa.bathrooms} Bathroom{villa.bathrooms > 1 ? 's' : ''}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Users size={20} className="text-sage md:w-6 md:h-6" />
-                                    <span className="text-olive text-sm md:text-lg">Max {villa.max_guests} Guests</span>
-                                </div>
-                            </div>
-
-                            <div className="mb-4 md:mb-6">
-                                <span className="text-2xl md:text-4xl font-bold text-sage">
-                                    {formatCurrency(villa.price_per_night)}
-                                </span>
-                                <span className="text-gray-600 text-base md:text-xl"> / night</span>
-                            </div>
-
-                            <p className="text-gray-700 text-sm md:text-lg leading-relaxed mb-6 md:mb-8">
-                                {villa.description}
-                            </p>
-
-                            {/* Amenities */}
-                            <div className="mb-6 md:mb-8">
-                                <h3 className="text-xl md:text-2xl font-semibold text-olive mb-3 md:mb-4">Amenities</h3>
-                                <div className="grid grid-cols-2 gap-2 md:gap-3">
-                                    {villa.amenities.map((amenity, index) => (
-                                        <div key={index} className="flex items-center space-x-2">
-                                            <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-sage/20 rounded-full flex items-center justify-center">
-                                                <Check size={12} className="text-sage md:w-4 md:h-4" />
-                                            </div>
-                                            <span className="text-gray-700 text-sm md:text-base">{amenity}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="flex items-center text-muted">
+                                <MapPin size={16} className="mr-2" />
+                                <span>{villa.location}</span>
                             </div>
                         </div>
+                        <div className="text-right">
+                            <p className="font-display text-4xl text-primary">
+                                {formatCurrency(villa.price_per_night)}
+                            </p>
+                            <p className="text-muted text-sm">per night</p>
+                        </div>
+                    </div>
+                </motion.div>
 
-                        {/* Booking Card */}
+                {/* Image Gallery */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mb-16"
+                >
+                    {/* Main Image */}
+                    <div
+                        className="relative aspect-[16/9] overflow-hidden cursor-pointer group mb-2"
+                        onClick={() => setShowLightbox(true)}
+                    >
+                        <Image
+                            src={villa.images[selectedImage]}
+                            alt={`${villa.name} - Image ${selectedImage + 1}`}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-102"
+                            priority
+                        />
+                        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+                    </div>
+
+                    {/* Thumbnail Strip */}
+                    <div className="grid grid-cols-6 gap-2">
+                        {villa.images.slice(0, 6).map((image, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setSelectedImage(index)}
+                                className={`relative aspect-square overflow-hidden transition-all
+                                    ${selectedImage === index ? 'ring-2 ring-primary' : 'opacity-70 hover:opacity-100'}
+                                `}
+                            >
+                                <Image
+                                    src={image}
+                                    alt={`${villa.name} thumbnail ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </button>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 mb-24">
+                    {/* Left: Details */}
+                    <div className="lg:col-span-2 space-y-16">
+                        {/* Key Features */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="bg-gradient-to-br from-sage to-sage-dark rounded-xl md:rounded-2xl p-4 md:p-6 text-white lg:sticky lg:top-24"
                         >
-                            <div className="text-center mb-4 md:mb-6">
-                                <p className="text-white/80 mb-1 text-sm md:text-base">Starting from</p>
-                                <p className="text-2xl md:text-3xl font-bold">{formatCurrency(villa.price_per_night)}</p>
-                                <p className="text-white/80 text-sm md:text-base">per night</p>
+                            <div className="grid grid-cols-3 gap-8 pb-12 border-b border-primary/10">
+                                <div>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Bed size={24} className="text-muted" />
+                                        <span className="font-display text-3xl text-primary">{villa.bedrooms}</span>
+                                    </div>
+                                    <p className="text-muted text-sm">Bedrooms</p>
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Bath size={24} className="text-muted" />
+                                        <span className="font-display text-3xl text-primary">{villa.bathrooms}</span>
+                                    </div>
+                                    <p className="text-muted text-sm">Bathrooms</p>
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Users size={24} className="text-muted" />
+                                        <span className="font-display text-3xl text-primary">{villa.max_guests}</span>
+                                    </div>
+                                    <p className="text-muted text-sm">Guests</p>
+                                </div>
                             </div>
+                        </motion.div>
 
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => setShowBookingModal(true)}
-                                className="w-full bg-white text-sage py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-base md:text-lg hover:bg-cream transition-colors flex items-center justify-center space-x-2 shadow-lg"
-                            >
-                                <Calendar size={20} className="md:w-6 md:h-6" />
-                                <span>Book Now</span>
-                            </motion.button>
-
-                            <p className="text-center text-white/70 text-xs md:text-sm mt-3 md:mt-4">
-                                Free cancellation within 24 hours
+                        {/* Description */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <h2 className="font-display text-2xl text-primary mb-6">About This Villa</h2>
+                            <p className="text-muted leading-relaxed whitespace-pre-line">
+                                {villa.description}
                             </p>
                         </motion.div>
-                    </motion.div>
-                </div>
 
-                {/* Lightbox */}
-                <AnimatePresence>
-                    {showLightbox && (
+                        {/* Amenities */}
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-                            onClick={() => setShowLightbox(false)}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
                         >
-                            <button
-                                onClick={() => setShowLightbox(false)}
-                                className="absolute top-4 right-4 text-white hover:text-sage transition-colors z-10"
-                            >
-                                <X size={28} className="md:w-8 md:h-8" />
-                            </button>
-
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    prevImage()
-                                }}
-                                className="absolute left-2 md:left-4 text-white hover:text-sage transition-colors"
-                            >
-                                <ChevronLeft size={36} className="md:w-12 md:h-12" />
-                            </button>
-
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    nextImage()
-                                }}
-                                className="absolute right-2 md:right-4 text-white hover:text-sage transition-colors"
-                            >
-                                <ChevronRight size={36} className="md:w-12 md:h-12" />
-                            </button>
-
-                            <div
-                                className="relative w-full max-w-5xl h-[60vh] md:h-[80vh]"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <Image
-                                    src={villa.images[selectedImage]}
-                                    alt={`${villa.name} - Image ${selectedImage + 1}`}
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
-
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-base md:text-lg">
-                                {selectedImage + 1} / {villa.images.length}
+                            <h2 className="font-display text-2xl text-primary mb-6">Amenities</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {villa.amenities.map((amenity, index) => (
+                                    <div key={index} className="flex items-center gap-3">
+                                        <Check size={16} className="text-accent" />
+                                        <span className="text-muted">{amenity}</span>
+                                    </div>
+                                ))}
                             </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
+                    </div>
+
+                    {/* Right: Booking Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="lg:sticky lg:top-32 h-fit"
+                    >
+                        <div className="border border-primary/10 p-8">
+                            <div className="mb-8">
+                                <p className="text-muted text-sm mb-2">Starting from</p>
+                                <p className="font-display text-4xl text-primary mb-1">
+                                    {formatCurrency(villa.price_per_night)}
+                                </p>
+                                <p className="text-muted text-sm">per night</p>
+                            </div>
+
+                            <button
+                                onClick={() => setShowBookingModal(true)}
+                                className="w-full bg-primary text-white py-4 text-sm tracking-[0.2em] uppercase hover:bg-secondary transition-colors mb-4"
+                            >
+                                Check Availability
+                            </button>
+
+                            <a
+                                href={`https://wa.me/6281234567890?text=Hi, I'm interested in ${villa.name}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block w-full text-center border border-primary/20 text-primary py-4 text-sm tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all"
+                            >
+                                Contact Us
+                            </a>
+                        </div>
+                    </motion.div>
+                </div>
             </div>
 
-            {/* Booking Modal */}
+            {/* Lightbox */}
             <AnimatePresence>
-                {showBookingModal && (
+                {showLightbox && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
-                        onClick={() => setShowBookingModal(false)}
+                        className="fixed inset-0 z-50 bg-primary flex items-center justify-center"
+                        onClick={() => setShowLightbox(false)}
                     >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="my-4 md:my-8 w-full max-w-2xl"
+                        <button
+                            onClick={() => setShowLightbox(false)}
+                            className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors"
                         >
-                            <ModernBookingFlow
-                                villa={villa}
-                                onClose={() => setShowBookingModal(false)}
+                            <X size={32} />
+                        </button>
+
+                        <button
+                            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                            className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-primary transition-all"
+                        >
+                            <ChevronLeft size={24} />
+                        </button>
+
+                        <button
+                            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                            className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-primary transition-all"
+                        >
+                            <ChevronRight size={24} />
+                        </button>
+
+                        <div className="relative w-full max-w-5xl aspect-[16/10] mx-8">
+                            <Image
+                                src={villa.images[selectedImage]}
+                                alt={`${villa.name} - Image ${selectedImage + 1}`}
+                                fill
+                                className="object-contain"
                             />
-                        </motion.div>
+                        </div>
+
+                        <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 text-sm">
+                            {selectedImage + 1} / {villa.images.length}
+                        </p>
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Booking Modal */}
+            {showBookingModal && (
+                <ModernBookingFlow
+                    villa={villa}
+                    onClose={() => setShowBookingModal(false)}
+                />
+            )}
         </>
     )
 }

@@ -1,154 +1,134 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Calendar, Users, Search } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowDownRight } from 'lucide-react'
 
 export default function Hero() {
-    const router = useRouter()
-    const [scrollY, setScrollY] = useState(0)
-    const { scrollYProgress } = useScroll()
+    const ref = useRef<HTMLElement>(null)
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start start", "end start"]
+    })
 
-    const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 500])
-    const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
-
-    useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY)
-        window.addEventListener('scroll', handleScroll)
-        return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault()
-        router.push('/villas')
-    }
+    const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+    const textY = useTransform(scrollYProgress, [0, 1], ['0%', '50%'])
+    const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+    const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1])
 
     return (
-        <section className="relative h-screen overflow-hidden">
-            {/* Parallax Background */}
+        <section ref={ref} className="relative h-screen overflow-hidden bg-primary">
+            {/* Background Image with Parallax */}
             <motion.div
-                style={{ y: parallaxY, opacity }}
-                className="absolute inset-0 z-0"
+                style={{ y: backgroundY, scale }}
+                className="absolute inset-0 w-full h-[120%] -top-[10%]"
             >
                 <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                        backgroundImage: 'url(https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=1920&q=80)',
+                        backgroundImage: 'url(https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80)',
                     }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-cream" />
+                {/* Minimal Overlay */}
+                <div className="absolute inset-0 bg-primary/40" />
             </motion.div>
 
-            {/* Content */}
-            <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-                <div className="max-w-4xl mx-auto text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
-                        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                            Experience Luxury in the
-                            <br />
-                            <span className="text-sage-light font-knewave">Heart of Ubud</span>
-                        </h1>
-                    </motion.div>
-
+            {/* Main Content */}
+            <motion.div
+                style={{ y: textY, opacity }}
+                className="relative z-10 h-full flex flex-col justify-end px-6 md:px-12 pb-24 md:pb-32"
+            >
+                <div className="max-w-[1400px] mx-auto w-full">
+                    {/* Overline */}
                     <motion.p
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        className="text-xl md:text-2xl text-white/90 mb-12"
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="text-white/60 text-sm tracking-[0.3em] uppercase mb-6 md:mb-8"
                     >
-                        Discover your perfect villa retreat with stunning rice field views,
-                        private pools, and authentic Balinese hospitality.
+                        Luxury Villas in Ubud, Bali
                     </motion.p>
 
-                    {/* Search Widget */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.6 }}
-                        className="glass rounded-2xl p-6 md:p-8 max-w-3xl mx-auto"
-                    >
-                        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="md:col-span-1">
-                                <label className="block text-sm font-medium text-olive mb-2">
-                                    <Calendar size={16} className="inline mr-1" />
-                                    Check In
-                                </label>
-                                <input
-                                    type="date"
-                                    className="w-full px-4 py-3 rounded-lg border border-sage/30 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all"
-                                    min={new Date().toISOString().split('T')[0]}
-                                />
-                            </div>
+                    {/* Main Heading */}
+                    <div className="overflow-hidden mb-8">
+                        <motion.h1
+                            initial={{ y: 120 }}
+                            animate={{ y: 0 }}
+                            transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                            className="font-display text-display-xl text-white leading-[0.9]"
+                        >
+                            Redefining
+                        </motion.h1>
+                    </div>
+                    <div className="overflow-hidden mb-12">
+                        <motion.h1
+                            initial={{ y: 120 }}
+                            animate={{ y: 0 }}
+                            transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                            className="font-display text-display-xl text-white leading-[0.9]"
+                        >
+                            <span className="text-accent">Spaces</span>
+                        </motion.h1>
+                    </div>
 
-                            <div className="md:col-span-1">
-                                <label className="block text-sm font-medium text-olive mb-2">
-                                    <Calendar size={16} className="inline mr-1" />
-                                    Check Out
-                                </label>
-                                <input
-                                    type="date"
-                                    className="w-full px-4 py-3 rounded-lg border border-sage/30 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all"
-                                    min={new Date().toISOString().split('T')[0]}
-                                />
-                            </div>
+                    {/* Bottom Row */}
+                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+                        {/* Description */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.9 }}
+                            className="text-white/70 text-lg md:text-xl max-w-md font-light leading-relaxed"
+                        >
+                            Experience architectural excellence and serene luxury
+                            in the heart of Bali's cultural paradise.
+                        </motion.p>
 
-                            <div className="md:col-span-1">
-                                <label className="block text-sm font-medium text-olive mb-2">
-                                    <Users size={16} className="inline mr-1" />
-                                    Guests
-                                </label>
-                                <select className="w-full px-4 py-3 rounded-lg border border-sage/30 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all">
-                                    <option>1-2</option>
-                                    <option>3-4</option>
-                                    <option>5-6</option>
-                                    <option>7-8</option>
-                                </select>
-                            </div>
-
-                            <div className="md:col-span-1 flex items-end">
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    type="submit"
-                                    className="w-full bg-sage text-white py-3 px-6 rounded-lg font-semibold hover:bg-sage-dark transition-all smooth-transition shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 animate-float"
-                                >
-                                    <Search size={20} />
-                                    <span>Search</span>
-                                </motion.button>
-                            </div>
-                        </form>
-                    </motion.div>
-
-                    {/* Scroll Indicator */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 1, delay: 1.2 }}
-                        className="mt-16"
-                    >
-                        <div className="animate-bounce">
-                            <svg
-                                className="w-6 h-6 text-white/70 mx-auto"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                                />
-                            </svg>
-                        </div>
-                    </motion.div>
+                        {/* CTA Button */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 1.1 }}
+                        >
+                            <Link href="/villas" className="group inline-flex items-center gap-4">
+                                <span className="text-white text-sm tracking-[0.2em] uppercase">
+                                    Explore Villas
+                                </span>
+                                <div className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white group-hover:text-primary transition-all duration-500">
+                                    <ArrowDownRight size={20} className="text-white group-hover:text-primary transition-colors" />
+                                </div>
+                            </Link>
+                        </motion.div>
+                    </div>
                 </div>
-            </div>
+            </motion.div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.5 }}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+            >
+                <motion.div
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-px h-16 bg-gradient-to-b from-white/0 via-white/50 to-white/0"
+                />
+            </motion.div>
+
+            {/* Side Text */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.3 }}
+                className="absolute right-8 top-1/2 -translate-y-1/2 z-20 hidden xl:block"
+            >
+                <p className="text-white/40 text-xs tracking-[0.3em] uppercase rotate-90 origin-center whitespace-nowrap">
+                    Est. 2016 — Ubud, Bali
+                </p>
+            </motion.div>
         </section>
     )
 }

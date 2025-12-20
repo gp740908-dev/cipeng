@@ -2,211 +2,188 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Filter, SlidersHorizontal } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Villa } from '@/types'
 import VillaCard from '@/components/VillaCard'
-import VillaCardSkeleton from '@/components/Skeletons'
+import { SlidersHorizontal, X } from 'lucide-react'
 
 export default function VillasList() {
+    const supabase = createClient()
     const [villas, setVillas] = useState<Villa[]>([])
     const [filteredVillas, setFilteredVillas] = useState<Villa[]>([])
     const [loading, setLoading] = useState(true)
     const [showFilters, setShowFilters] = useState(false)
 
-    // Filter states
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000])
+    // Filters
+    const [maxPrice, setMaxPrice] = useState<number>(0)
     const [minGuests, setMinGuests] = useState<number>(0)
     const [bedrooms, setBedrooms] = useState<number>(0)
-
-    const supabase = createClient()
 
     useEffect(() => {
         fetchVillas()
     }, [])
 
-    useEffect(() => {
-        applyFilters()
-    }, [villas, priceRange, minGuests, bedrooms])
-
     async function fetchVillas() {
-        try {
-            setLoading(true)
-            const { data, error } = await supabase
-                .from('villas')
-                .select('*')
-                .order('created_at', { ascending: false })
+        const { data, error } = await supabase
+            .from('villas')
+            .select('*')
+            .order('created_at', { ascending: false })
 
-            if (error) throw error
-            setVillas(data || [])
-            setFilteredVillas(data || [])
-        } catch (error) {
-            console.error('Error fetching villas:', error)
-        } finally {
-            setLoading(false)
+        if (!error && data) {
+            setVillas(data)
+            setFilteredVillas(data)
         }
+        setLoading(false)
     }
 
-    function applyFilters() {
+    useEffect(() => {
         let filtered = [...villas]
 
-        // Price filter
-        filtered = filtered.filter(
-            (villa) =>
-                villa.price_per_night >= priceRange[0] &&
-                villa.price_per_night <= priceRange[1]
-        )
-
-        // Guests filter
-        if (minGuests > 0) {
-            filtered = filtered.filter((villa) => villa.max_guests >= minGuests)
+        if (maxPrice > 0) {
+            filtered = filtered.filter(v => v.price_per_night <= maxPrice)
         }
-
-        // Bedrooms filter
+        if (minGuests > 0) {
+            filtered = filtered.filter(v => v.max_guests >= minGuests)
+        }
         if (bedrooms > 0) {
-            filtered = filtered.filter((villa) => villa.bedrooms >= bedrooms)
+            filtered = filtered.filter(v => v.bedrooms >= bedrooms)
         }
 
         setFilteredVillas(filtered)
-    }
+    }, [maxPrice, minGuests, bedrooms, villas])
 
-    function resetFilters() {
-        setPriceRange([0, 10000000])
+    const clearFilters = () => {
+        setMaxPrice(0)
         setMinGuests(0)
         setBedrooms(0)
     }
 
+    const hasFilters = maxPrice > 0 || minGuests > 0 || bedrooms > 0
+
+    if (loading) {
+        return (
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="space-y-4">
+                            <div className="aspect-[4/5] bg-light animate-pulse" />
+                            <div className="h-6 bg-light animate-pulse w-3/4" />
+                            <div className="h-4 bg-light animate-pulse w-1/2" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
     return (
-        <div className="container mx-auto px-4">
-            {/* Filters Bar */}
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+            {/* Filter Bar */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mb-8"
+                className="flex items-center justify-between mb-12 pb-6 border-b border-primary/10"
             >
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
+                <p className="text-muted">
+                    {filteredVillas.length} {filteredVillas.length === 1 ? 'property' : 'properties'} available
+                </p>
+
+                <div className="flex items-center gap-4">
+                    {hasFilters && (
                         <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className="flex items-center space-x-2 text-olive hover:text-sage transition-colors"
+                            onClick={clearFilters}
+                            className="text-sm text-muted hover:text-primary transition-colors flex items-center gap-1"
                         >
-                            <SlidersHorizontal size={20} />
-                            <span className="font-medium">
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </span>
+                            <X size={14} />
+                            Clear
                         </button>
-                        <div className="text-sm text-gray-600">
-                            {filteredVillas.length} {filteredVillas.length === 1 ? 'villa' : 'villas'} found
-                        </div>
+                    )}
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="flex items-center gap-2 text-sm tracking-[0.1em] uppercase text-primary px-4 py-2 border border-primary/20 hover:bg-primary hover:text-white transition-all"
+                    >
+                        <SlidersHorizontal size={16} />
+                        <span>Filter</span>
+                    </button>
+                </div>
+            </motion.div>
+
+            {/* Filters Panel */}
+            <motion.div
+                initial={false}
+                animate={{ height: showFilters ? 'auto' : 0, opacity: showFilters ? 1 : 0 }}
+                className="overflow-hidden"
+            >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 pb-12 border-b border-primary/10">
+                    <div>
+                        <label className="block text-sm text-muted mb-3 tracking-wide">
+                            Max Price (per night)
+                        </label>
+                        <select
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(Number(e.target.value))}
+                            className="w-full px-4 py-3 bg-transparent border border-primary/20 text-primary focus:border-primary outline-none transition-colors"
+                        >
+                            <option value={0}>Any price</option>
+                            <option value={3000000}>Under IDR 3,000,000</option>
+                            <option value={5000000}>Under IDR 5,000,000</option>
+                            <option value={8000000}>Under IDR 8,000,000</option>
+                            <option value={10000000}>Under IDR 10,000,000</option>
+                        </select>
                     </div>
 
-                    {showFilters && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-6 border-t"
+                    <div>
+                        <label className="block text-sm text-muted mb-3 tracking-wide">
+                            Minimum Guests
+                        </label>
+                        <select
+                            value={minGuests}
+                            onChange={(e) => setMinGuests(Number(e.target.value))}
+                            className="w-full px-4 py-3 bg-transparent border border-primary/20 text-primary focus:border-primary outline-none transition-colors"
                         >
-                            {/* Price Range */}
-                            <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
-                                    Harga Maksimum (per malam)
-                                </label>
-                                <div className="space-y-2">
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="10000000"
-                                        step="500000"
-                                        value={priceRange[1]}
-                                        onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                                        className="w-full accent-sage"
-                                    />
-                                    <div className="text-sm text-gray-600">
-                                        Maks Rp{(priceRange[1] / 1000000).toFixed(1)} juta
-                                    </div>
-                                </div>
-                            </div>
+                            <option value={0}>Any</option>
+                            <option value={2}>2+ guests</option>
+                            <option value={4}>4+ guests</option>
+                            <option value={6}>6+ guests</option>
+                            <option value={8}>8+ guests</option>
+                        </select>
+                    </div>
 
-                            {/* Min Guests */}
-                            <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
-                                    Minimum Guests
-                                </label>
-                                <select
-                                    value={minGuests}
-                                    onChange={(e) => setMinGuests(parseInt(e.target.value))}
-                                    className="w-full px-4 py-2 rounded-lg border border-sage/30 focus:border-sage focus:ring-2 focus:ring-sage/20"
-                                >
-                                    <option value="0">Any</option>
-                                    <option value="2">2+</option>
-                                    <option value="4">4+</option>
-                                    <option value="6">6+</option>
-                                    <option value="8">8+</option>
-                                </select>
-                            </div>
-
-                            {/* Bedrooms */}
-                            <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
-                                    Bedrooms
-                                </label>
-                                <select
-                                    value={bedrooms}
-                                    onChange={(e) => setBedrooms(parseInt(e.target.value))}
-                                    className="w-full px-4 py-2 rounded-lg border border-sage/30 focus:border-sage focus:ring-2 focus:ring-sage/20"
-                                >
-                                    <option value="0">Any</option>
-                                    <option value="1">1+</option>
-                                    <option value="2">2+</option>
-                                    <option value="3">3+</option>
-                                    <option value="4">4+</option>
-                                </select>
-                            </div>
-
-                            {/* Reset Button */}
-                            <div className="flex items-end">
-                                <button
-                                    onClick={resetFilters}
-                                    className="w-full px-4 py-2 border-2 border-sage text-sage rounded-lg hover:bg-sage hover:text-white transition-all"
-                                >
-                                    Reset Filters
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
+                    <div>
+                        <label className="block text-sm text-muted mb-3 tracking-wide">
+                            Bedrooms
+                        </label>
+                        <select
+                            value={bedrooms}
+                            onChange={(e) => setBedrooms(Number(e.target.value))}
+                            className="w-full px-4 py-3 bg-transparent border border-primary/20 text-primary focus:border-primary outline-none transition-colors"
+                        >
+                            <option value={0}>Any</option>
+                            <option value={1}>1+ bedroom</option>
+                            <option value={2}>2+ bedrooms</option>
+                            <option value={3}>3+ bedrooms</option>
+                            <option value={4}>4+ bedrooms</option>
+                        </select>
+                    </div>
                 </div>
             </motion.div>
 
             {/* Villas Grid */}
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {[...Array(6)].map((_, i) => (
-                        <VillaCardSkeleton key={i} />
-                    ))}
+            {filteredVillas.length === 0 ? (
+                <div className="text-center py-24">
+                    <p className="text-muted text-lg mb-4">No properties match your criteria</p>
+                    <button
+                        onClick={clearFilters}
+                        className="text-primary underline hover:no-underline"
+                    >
+                        Clear all filters
+                    </button>
                 </div>
-            ) : filteredVillas.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
                     {filteredVillas.map((villa, index) => (
                         <VillaCard key={villa.id} villa={villa} index={index} />
                     ))}
-                </div>
-            ) : (
-                <div className="text-center py-20">
-                    <Filter size={48} className="text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-2xl font-semibold text-olive mb-2">
-                        No villas found
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                        Try adjusting your filters to see more results
-                    </p>
-                    <button
-                        onClick={resetFilters}
-                        className="bg-sage text-white px-6 py-3 rounded-lg hover:bg-sage-dark transition-colors"
-                    >
-                        Reset Filters
-                    </button>
                 </div>
             )}
         </div>

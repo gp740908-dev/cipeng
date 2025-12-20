@@ -3,12 +3,12 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "StayinUBUD - Luxury Villa Rentals in Ubud, Bali",
-  description: "Experience luxury in the heart of Ubud with our premium villa rentals. Private pools, stunning views, and authentic Balinese hospitality.",
-  keywords: "Ubud villas, Bali accommodation, luxury villas, rice field view, private pool, Ubud rental",
+  description: "Experience architectural excellence and serene luxury in the heart of Bali's cultural paradise. Curated villa collection with private pools and stunning views.",
+  keywords: "Ubud villas, Bali accommodation, luxury villas, rice field view, private pool, Ubud rental, architectural design",
   authors: [{ name: "StayinUBUD" }],
   openGraph: {
     title: "StayinUBUD - Luxury Villa Rentals in Ubud, Bali",
-    description: "Experience luxury in the heart of Ubud with our premium villa rentals.",
+    description: "Experience architectural excellence and serene luxury in the heart of Bali's cultural paradise.",
     type: "website",
     locale: "en_US",
   },
@@ -21,7 +21,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className="antialiased bg-cream font-body text-primary">
         {children}
       </body>
     </html>

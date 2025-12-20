@@ -8,8 +8,8 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import BackToTop from '@/components/BackToTop'
 
 export const metadata: Metadata = {
-    title: 'Journal | StayinUBUD - Tips & Panduan Liburan di Bali',
-    description: 'Baca artikel terbaru tentang tips liburan, destinasi wisata, dan panduan menginap di villa Ubud, Bali.',
+    title: 'Journal | StayinUBUD - Stories & Insights',
+    description: 'Explore our journal for travel tips, destination guides, and stories from Ubud, Bali.',
 }
 
 export default function BlogPage() {
@@ -18,17 +18,22 @@ export default function BlogPage() {
             <Navbar />
             <PageHeader
                 title="Journal"
-                subtitle="Tips, panduan, dan cerita inspiratif seputar liburan di Bali"
+                subtitle="Stories, insights, and inspiration from Ubud"
                 backgroundImage="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1920&q=80"
                 breadcrumbs={[{ label: 'Journal' }]}
                 height="medium"
             />
-            <section className="py-16">
+            <section className="py-24">
                 <Suspense fallback={
-                    <div className="container mx-auto px-4">
-                        <div className="text-center py-20">
-                            <div className="animate-spin w-12 h-12 border-4 border-sage border-t-transparent rounded-full mx-auto"></div>
-                            <p className="mt-4 text-gray-600">Memuat artikel...</p>
+                    <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="space-y-4">
+                                    <div className="aspect-[4/3] bg-light animate-pulse" />
+                                    <div className="h-6 bg-light animate-pulse w-3/4" />
+                                    <div className="h-4 bg-light animate-pulse w-1/2" />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 }>

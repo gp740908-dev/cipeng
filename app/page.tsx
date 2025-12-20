@@ -3,6 +3,7 @@ import Hero from '@/components/home/Hero'
 import FeaturedVillas from '@/components/home/FeaturedVillas'
 import Features from '@/components/home/Features'
 import Testimonials from '@/components/home/Testimonials'
+import CTASection from '@/components/home/CTASection'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
@@ -21,6 +22,7 @@ export default function HomePage() {
       <FeaturedVillas />
       <Features />
       <Testimonials />
+      <CTASection />
       <Footer />
       <WhatsAppButton />
       <BackToTop />
