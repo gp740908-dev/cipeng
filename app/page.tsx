@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Hero from '@/components/home/Hero'
-import FeaturedVillas from '@/components/home/FeaturedVillas'
+import Experience from '@/components/home/Experience'
 import Features from '@/components/home/Features'
 import Testimonials from '@/components/home/Testimonials'
 import CTASection from '@/components/home/CTASection'
@@ -19,8 +19,8 @@ export default function HomePage() {
     <main className="min-h-screen">
       <Navbar />
       <Hero />
-      <FeaturedVillas />
       <Features />
+      <Experience />
       <Testimonials />
       <CTASection />
       <Footer />
