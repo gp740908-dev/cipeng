@@ -6,10 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { Villa } from '@/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Star, Award } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
-// Fallback data jika database kosong
+// Fallback data
 const fallbackVillas = [
     {
         id: '1',
@@ -19,7 +19,8 @@ const fallbackVillas = [
         bathrooms: 3,
         max_guests: 6,
         images: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80'],
-        location: 'Ubud, Bali'
+        location: 'Ubud, Bali',
+        featured: true
     },
     {
         id: '2',
@@ -49,7 +50,8 @@ const fallbackVillas = [
         bathrooms: 5,
         max_guests: 10,
         images: ['https://images.unsplash.com/photo-1540541338287-41700207dee6?w=800&q=80'],
-        location: 'Ubud, Bali'
+        location: 'Ubud, Bali',
+        featured: true
     },
     {
         id: '5',
@@ -94,33 +96,57 @@ export default function FeaturedVillas() {
     const displayVillas = villas
 
     return (
-        <section ref={ref} className="py-24 md:py-32 bg-white">
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+        <section ref={ref} className="py-24 md:py-32 bg-white relative overflow-hidden">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-bl from-accent/5 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-gradient-to-tr from-gray-50 to-transparent pointer-events-none" />
+
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative z-10">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16 gap-6">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={isInView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <p className="text-gray-500 text-sm tracking-[0.3em] uppercase mb-4">
-                            Featured Collection
-                        </p>
-                        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-gray-900">
-                            Selected <span className="italic">Villas</span>
-                        </h2>
-                    </motion.div>
+                <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-16 gap-8">
+                    <div className="max-w-2xl">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={isInView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.6 }}
+                            className="flex items-center gap-3 mb-6"
+                        >
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-900">
+                                <Award size={12} className="text-amber-400" />
+                                <span className="text-white text-[10px] tracking-[0.2em] uppercase">Curated Selection</span>
+                            </div>
+                        </motion.div>
+
+                        <motion.h2
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={isInView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.8, delay: 0.1 }}
+                            className="font-display text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6"
+                        >
+                            Selected <span className="italic text-amber-700">Villas</span>
+                        </motion.h2>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={isInView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="text-gray-500 max-w-lg leading-relaxed"
+                        >
+                            Each property in our collection represents the pinnacle of
+                            Balinese architecture and hospitality excellence.
+                        </motion.p>
+                    </div>
 
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.8, delay: 0.2 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
                     >
                         <Link
                             href="/villas"
-                            className="inline-flex items-center gap-2 text-gray-900 text-sm tracking-[0.2em] uppercase group"
+                            className="group inline-flex items-center gap-3 px-6 py-4 border border-gray-200 hover:bg-gray-900 hover:border-gray-900 hover:text-white transition-all duration-500"
                         >
-                            <span>View All</span>
+                            <span className="text-xs tracking-[0.2em] uppercase">View All Properties</span>
                             <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         </Link>
                     </motion.div>
@@ -128,25 +154,25 @@ export default function FeaturedVillas() {
 
                 {/* Loading State */}
                 {loading && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-                        <div className="col-span-2 row-span-2 aspect-square bg-gray-200 animate-pulse" />
-                        <div className="aspect-square bg-gray-200 animate-pulse" />
-                        <div className="aspect-square bg-gray-200 animate-pulse" />
-                        <div className="row-span-2 aspect-[1/2] bg-gray-200 animate-pulse" />
-                        <div className="aspect-square bg-gray-200 animate-pulse" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="col-span-2 row-span-2 aspect-square skeleton" />
+                        <div className="aspect-square skeleton" />
+                        <div className="aspect-square skeleton" />
+                        <div className="row-span-2 aspect-[1/2] skeleton" />
+                        <div className="aspect-square skeleton" />
                     </div>
                 )}
 
                 {/* Bento Grid */}
                 {!loading && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {displayVillas.slice(0, 5).map((villa, index) => {
                             const gridClasses = [
                                 'col-span-2 row-span-2',
-                                'col-span-1 row-span-1',
-                                'col-span-1 row-span-1',
-                                'col-span-1 row-span-2',
-                                'col-span-1 row-span-1',
+                                '',
+                                '',
+                                'row-span-2',
+                                '',
                             ]
 
                             const aspectClasses = [
@@ -157,42 +183,56 @@ export default function FeaturedVillas() {
                                 'aspect-square',
                             ]
 
+                            // Mark first and last as featured
+                            const isFeatured = index === 0 || index === 3
+
                             return (
                                 <motion.div
                                     key={villa.id}
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={isInView ? { opacity: 1, y: 0 } : {}}
-                                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                                    className={`${gridClasses[index] || 'col-span-1'} relative group overflow-hidden bg-gray-100`}
+                                    transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
+                                    className={`${gridClasses[index]} relative group overflow-hidden bg-gray-100`}
                                 >
                                     <Link href={`/villas/${villa.id}`} className="block h-full">
-                                        <div className={`relative ${aspectClasses[index] || 'aspect-square'} w-full h-full`}>
+                                        <div className={`relative ${aspectClasses[index]} w-full h-full`}>
                                             <Image
                                                 src={villa.images[0]}
                                                 alt={villa.name}
                                                 fill
-                                                sizes="(max-width: 768px) 50vw, 25vw"
-                                                className="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                                                sizes={index === 0 ? "50vw" : "(max-width: 768px) 50vw, 25vw"}
+                                                className="object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
                                             />
 
-                                            {/* Hover Overlay */}
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-all duration-500 flex flex-col justify-end p-4 md:p-6">
-                                                <div className="translate-y-8 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                                    <p className="text-white/60 text-xs tracking-[0.2em] uppercase mb-2">
+                                            {/* Featured Badge */}
+                                            {isFeatured && (
+                                                <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm">
+                                                    <Star size={10} className="text-amber-500 fill-amber-500" />
+                                                    <span className="text-gray-900 text-[9px] tracking-[0.15em] uppercase font-medium">Featured</span>
+                                                </div>
+                                            )}
+
+                                            {/* Gradient Overlay */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                                            {/* Hover Content */}
+                                            <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6">
+                                                <div className="translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                                                    <p className="text-white/60 text-[10px] md:text-xs tracking-[0.15em] uppercase mb-2">
                                                         From {formatCurrency(villa.price_per_night)}/night
                                                     </p>
-                                                    <h3 className="text-white font-display text-xl md:text-2xl lg:text-3xl mb-2">
+                                                    <h3 className="text-white font-display text-lg md:text-xl lg:text-2xl mb-1">
                                                         {villa.name}
                                                     </h3>
-                                                    <p className="text-white/70 text-sm">
-                                                        {villa.bedrooms} BR · {villa.max_guests} Guests
+                                                    <p className="text-white/60 text-xs md:text-sm">
+                                                        {villa.bedrooms} Bedrooms · {villa.max_guests} Guests
                                                     </p>
                                                 </div>
                                             </div>
 
                                             {/* Corner Arrow */}
-                                            <div className="absolute top-3 right-3 md:top-4 md:right-4 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/0 group-hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                                <ArrowUpRight size={16} className="text-gray-900" />
+                                            <div className="absolute top-4 right-4 w-8 h-8 md:w-10 md:h-10 bg-white/0 group-hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                                <ArrowUpRight size={14} className="text-gray-900" />
                                             </div>
                                         </div>
                                     </Link>
@@ -202,28 +242,32 @@ export default function FeaturedVillas() {
                     </div>
                 )}
 
-                {/* Bottom Stats */}
+                {/* Bottom Stats with Gold Divider */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.8, delay: 0.6 }}
-                    className="mt-16 pt-16 border-t border-gray-200 grid grid-cols-2 md:grid-cols-4 gap-8"
+                    transition={{ duration: 0.8, delay: 0.8 }}
+                    className="mt-20"
                 >
-                    <div>
-                        <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">25+</p>
-                        <p className="text-gray-500 text-sm tracking-wide">Curated Properties</p>
-                    </div>
-                    <div>
-                        <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">8</p>
-                        <p className="text-gray-500 text-sm tracking-wide">Years Excellence</p>
-                    </div>
-                    <div>
-                        <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">4.9</p>
-                        <p className="text-gray-500 text-sm tracking-wide">Guest Rating</p>
-                    </div>
-                    <div>
-                        <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">2K+</p>
-                        <p className="text-gray-500 text-sm tracking-wide">Happy Guests</p>
+                    <div className="h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent mb-12" />
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                        <div className="text-center">
+                            <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">25+</p>
+                            <p className="text-gray-400 text-xs tracking-[0.15em] uppercase">Curated Properties</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">8</p>
+                            <p className="text-gray-400 text-xs tracking-[0.15em] uppercase">Years Excellence</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">4.9</p>
+                            <p className="text-gray-400 text-xs tracking-[0.15em] uppercase">Guest Rating</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="font-display text-4xl md:text-5xl text-gray-900 mb-2">2K+</p>
+                            <p className="text-gray-400 text-xs tracking-[0.15em] uppercase">Happy Guests</p>
+                        </div>
                     </div>
                 </motion.div>
             </div>

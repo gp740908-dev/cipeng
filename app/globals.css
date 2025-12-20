@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -36,38 +36,56 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrolling */
+/* ============================================
+   EXCLUSIVE LUXURY ENHANCEMENTS
+   ============================================ */
+
+/* Subtle Grain Texture Overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Smooth scrolling with better easing */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 }
 
-/* Custom scrollbar - Minimal */
+/* Custom Luxury Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--cream);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D1D1;
-  border-radius: 3px;
+  background: var(--accent);
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #B0B0B0;
+  background: var(--accent-light);
 }
 
-/* Selection highlight */
+/* Premium Selection Highlight */
 ::selection {
   background: var(--accent);
   color: white;
 }
 
-/* Typography Classes */
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
 .font-display {
   font-family: var(--font-display);
 }
@@ -76,161 +94,358 @@ body {
   font-family: var(--font-body);
 }
 
-/* Text Reveal Animation */
-.text-reveal {
-  overflow: hidden;
+/* Luxury Heading Styles */
+.luxury-heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
 }
 
-.text-reveal span {
-  display: inline-block;
-  transform: translateY(100%);
-  animation: textReveal 0.8s ease-out forwards;
+.luxury-subheading {
+  font-family: var(--font-body);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
 }
 
-@keyframes textReveal {
-  to {
-    transform: translateY(0);
-  }
-}
+/* ============================================
+   EXCLUSIVE BUTTON STYLES
+   ============================================ */
 
-/* Smooth Image Loading */
-img {
-  image-rendering: -webkit-optimize-contrast;
-}
-
-/* Link Hover Effect */
-.link-hover {
-  position: relative;
-  display: inline-block;
-}
-
-.link-hover::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: currentColor;
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.link-hover:hover::after {
-  width: 100%;
-}
-
-/* Minimal Button Styles */
-.btn-minimal {
+.btn-exclusive {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
-  font-size: 0.875rem;
+  padding: 1.25rem 2.5rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  font-family: var(--font-body);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border: 1px solid currentColor;
+  letter-spacing: 0.2em;
   background: transparent;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--primary);
+  color: var(--primary);
   overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-minimal::before {
+.btn-exclusive::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: currentColor;
-  transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-minimal:hover::before {
-  transform: translateY(0);
+.btn-exclusive:hover::before {
+  transform: scaleX(1);
 }
 
-.btn-minimal span {
+.btn-exclusive span {
   position: relative;
   z-index: 1;
-  transition: color 0.4s ease;
+  transition: color 0.3s ease 0.1s;
 }
 
-.btn-minimal:hover span {
+.btn-exclusive:hover span {
   color: var(--cream);
 }
 
-/* Grid System */
-.bento-grid {
-  display: grid;
-  gap: 0.5rem;
+/* Gold Accent Button */
+.btn-gold {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--primary);
 }
 
-/* Masonry Effect */
-.masonry-item {
-  break-inside: avoid;
+.btn-gold::before {
+  background: var(--primary);
 }
 
-/* Image Hover Zoom */
-.image-zoom-container {
+.btn-gold:hover span {
+  color: var(--accent);
+}
+
+/* ============================================
+   HOVER EFFECTS
+   ============================================ */
+
+/* Premium Link Hover */
+.link-premium {
+  position: relative;
+  display: inline-block;
   overflow: hidden;
 }
 
-.image-zoom {
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+.link-premium::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.image-zoom-container:hover .image-zoom {
-  transform: scale(1.08);
+.link-premium:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
-/* Overlay Effect */
-.overlay-reveal {
+/* Image Zoom with Reveal */
+.image-luxury {
   position: relative;
   overflow: hidden;
 }
 
-.overlay-reveal::after {
+.image-luxury img {
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.image-luxury:hover img {
+  transform: scale(1.05);
+}
+
+.image-luxury::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+  background: linear-gradient(to top,
+      rgba(10, 10, 10, 0.8) 0%,
+      rgba(10, 10, 10, 0) 50%);
   opacity: 0;
   transition: opacity 0.5s ease;
 }
 
-.overlay-reveal:hover::after {
+.image-luxury:hover::after {
   opacity: 1;
 }
 
-/* Swiss Typography */
-.swiss-heading {
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1;
+/* Gold Glow Effect */
+.gold-glow {
+  box-shadow: 0 0 60px -15px rgba(201, 169, 98, 0.3);
 }
 
-.swiss-body {
-  font-family: var(--font-body);
-  font-weight: 300;
-  letter-spacing: 0.01em;
-  line-height: 1.7;
+.gold-glow-hover {
+  transition: box-shadow 0.5s ease;
 }
 
-/* Divider Line */
-.divider {
+.gold-glow-hover:hover {
+  box-shadow: 0 0 80px -15px rgba(201, 169, 98, 0.4);
+}
+
+/* ============================================
+   EXCLUSIVE BADGES & LABELS
+   ============================================ */
+
+.badge-exclusive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: var(--accent);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.badge-featured {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+}
+
+/* Divider with Gold Accent */
+.divider-gold {
   height: 1px;
-  background: linear-gradient(to right, transparent, var(--muted), transparent);
+  background: linear-gradient(to right,
+      transparent,
+      var(--accent),
+      transparent);
 }
 
-/* Print styles */
+/* ============================================
+   CARD STYLES
+   ============================================ */
+
+.card-luxury {
+  position: relative;
+  background: white;
+  border: 1px solid rgba(10, 10, 10, 0.05);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-luxury:hover {
+  border-color: rgba(10, 10, 10, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -15px rgba(10, 10, 10, 0.1);
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+/* Fade Up Animation */
+.animate-fade-up {
+  animation: fadeUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reveal Animation */
+.animate-reveal {
+  animation: reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Scale In */
+.animate-scale-in {
+  animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stagger Children */
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+/* ============================================
+   FORM INPUTS - LUXURY STYLE
+   ============================================ */
+
+.input-luxury {
+  width: 100%;
+  padding: 1rem 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(10, 10, 10, 0.15);
+  color: var(--primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-luxury:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input-luxury::placeholder {
+  color: var(--muted);
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--light) 25%,
+      rgba(245, 245, 245, 0.5) 50%,
+      var(--light) 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+  .luxury-heading {
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
 @media print {
   .no-print {
     display: none !important;
   }
+
+  body::before {
+    display: none;
+  }
 }
 
-/* Reduced motion preferences */
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
 @media (prefers-reduced-motion: reduce) {
 
   *,
@@ -240,4 +455,14 @@ img {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  body::before {
+    display: none;
+  }
+}
+
+/* Focus States for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

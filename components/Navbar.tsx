@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Phone } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 
@@ -44,53 +44,63 @@ export default function Navbar() {
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
                     ${isTransparent
                         ? 'bg-transparent py-6'
-                        : 'bg-cream/95 backdrop-blur-md py-4 border-b border-primary/5'}
+                        : 'bg-white/95 backdrop-blur-md py-4 border-b border-gray-100'
+                    }
                 `}
             >
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12">
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <Link href="/" className="relative z-10">
-                            <motion.span
-                                className={`font-display text-2xl md:text-3xl tracking-tight transition-colors duration-300
-                                    ${isTransparent ? 'text-white' : 'text-primary'}
-                                `}
-                            >
-                                StayinUBUD
-                            </motion.span>
+                            <span className={`font-display text-2xl md:text-3xl tracking-tight transition-colors duration-300
+                                ${isTransparent ? 'text-white' : 'text-gray-900'}
+                            `}>
+                                Stayin<span className="text-amber-500">UBUD</span>
+                            </span>
                         </Link>
 
                         {/* Desktop Menu */}
-                        <div className="hidden lg:flex items-center space-x-12">
+                        <div className="hidden lg:flex items-center gap-12">
                             {menuItems.map((item) => (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     className="relative group"
                                 >
-                                    <span className={`text-sm tracking-widest uppercase transition-colors duration-300
+                                    <span className={`text-xs tracking-[0.2em] uppercase transition-colors duration-300
                                         ${isActive(item.href)
-                                            ? isTransparent ? 'text-white' : 'text-primary'
-                                            : isTransparent ? 'text-white/70 hover:text-white' : 'text-muted hover:text-primary'}
+                                            ? isTransparent ? 'text-amber-400' : 'text-amber-600'
+                                            : isTransparent ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                                        }
                                     `}>
                                         {item.label}
                                     </span>
                                     <span className={`absolute -bottom-1 left-0 h-px transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
-                                        ${isTransparent ? 'bg-white' : 'bg-primary'}
+                                        ${isTransparent ? 'bg-amber-400' : 'bg-amber-500'}
                                         ${isActive(item.href) ? 'w-full' : 'w-0 group-hover:w-full'}
                                     `} />
                                 </Link>
                             ))}
                         </div>
 
-                        {/* CTA Button */}
-                        <div className="hidden lg:block">
+                        {/* CTA Buttons */}
+                        <div className="hidden lg:flex items-center gap-4">
+                            <a
+                                href="tel:+6281234567890"
+                                className={`flex items-center gap-2 text-xs transition-colors
+                                    ${isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-500 hover:text-gray-900'}
+                                `}
+                            >
+                                <Phone size={14} />
+                                <span className="hidden xl:inline">+62 812 3456 7890</span>
+                            </a>
                             <Link
                                 href="/villas"
-                                className={`text-sm tracking-widest uppercase px-6 py-3 border transition-all duration-300
+                                className={`text-xs tracking-[0.15em] uppercase px-6 py-3 transition-all duration-300
                                     ${isTransparent
-                                        ? 'border-white/30 text-white hover:bg-white hover:text-primary'
-                                        : 'border-primary/20 text-primary hover:bg-primary hover:text-white'}
+                                        ? 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-amber-500 hover:border-amber-500 hover:text-gray-900'
+                                        : 'bg-gray-900 text-white hover:bg-amber-500 hover:text-gray-900'
+                                    }
                                 `}
                             >
                                 Book Now
@@ -100,7 +110,7 @@ export default function Navbar() {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className={`lg:hidden p-2 transition-colors ${isTransparent ? 'text-white' : 'text-primary'}`}
+                            className={`lg:hidden p-2 transition-colors ${isTransparent ? 'text-white' : 'text-gray-900'}`}
                             aria-label="Open menu"
                         >
                             <Menu size={24} strokeWidth={1.5} />
@@ -118,7 +128,7 @@ export default function Navbar() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="fixed inset-0 z-50 bg-primary/20 backdrop-blur-sm lg:hidden"
+                            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
                             onClick={() => setIsMobileMenuOpen(false)}
                         />
 
@@ -127,14 +137,17 @@ export default function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                            className="fixed top-0 right-0 bottom-0 w-full max-w-md z-50 bg-cream lg:hidden"
+                            className="fixed top-0 right-0 bottom-0 w-full max-w-sm z-50 bg-white lg:hidden"
                         >
                             <div className="h-full flex flex-col p-8">
-                                {/* Close Button */}
-                                <div className="flex justify-end mb-16">
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-16">
+                                    <span className="font-display text-xl text-gray-900">
+                                        Stayin<span className="text-amber-500">UBUD</span>
+                                    </span>
                                     <button
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="p-2 text-primary"
+                                        className="p-2 text-gray-900"
                                         aria-label="Close menu"
                                     >
                                         <X size={24} strokeWidth={1.5} />
@@ -153,8 +166,8 @@ export default function Navbar() {
                                             <Link
                                                 href={item.href}
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className={`block py-4 text-4xl font-display border-b border-primary/10 transition-colors
-                                                    ${isActive(item.href) ? 'text-primary' : 'text-muted hover:text-primary'}
+                                                className={`block py-4 text-3xl font-display border-b border-gray-100 transition-colors
+                                                    ${isActive(item.href) ? 'text-amber-600' : 'text-gray-900 hover:text-amber-600'}
                                                 `}
                                             >
                                                 {item.label}
@@ -163,11 +176,21 @@ export default function Navbar() {
                                     ))}
                                 </div>
 
-                                {/* Bottom Info */}
-                                <div className="pt-8 border-t border-primary/10">
-                                    <p className="text-sm text-muted mb-2">Contact</p>
-                                    <a href="mailto:hello@stayinubud.com" className="text-primary hover:text-accent transition-colors">
-                                        hello@stayinubud.com
+                                {/* Bottom CTA */}
+                                <div className="pt-8 border-t border-gray-100 space-y-4">
+                                    <Link
+                                        href="/villas"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="block w-full py-4 bg-gray-900 text-white text-center text-sm tracking-[0.15em] uppercase hover:bg-amber-500 hover:text-gray-900 transition-colors"
+                                    >
+                                        Book Your Stay
+                                    </Link>
+                                    <a
+                                        href="tel:+6281234567890"
+                                        className="flex items-center justify-center gap-2 text-gray-500"
+                                    >
+                                        <Phone size={16} />
+                                        <span>+62 812 3456 7890</span>
                                     </a>
                                 </div>
                             </div>
