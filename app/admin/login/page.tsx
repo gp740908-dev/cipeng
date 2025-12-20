@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Lock, Mail, Loader2, AlertCircle, Info } from 'lucide-react'
+import { Lock, Mail, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
@@ -13,76 +13,82 @@ export default function AdminLoginPage() {
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    const [debugInfo, setDebugInfo] = useState('')
+    const [step, setStep] = useState('')
 
     const supabase = createClient()
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault()
         setError('')
-        setDebugInfo('')
+        setStep('')
         setLoading(true)
+
+        const normalizedEmail = email.trim().toLowerCase()
 
         try {
             // Step 1: Sign in with Supabase Auth
-            console.log('Step 1: Attempting sign in...')
+            setStep('Authenticating...')
             const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                email: email.trim(),
+                email: normalizedEmail,
                 password,
             })
 
             if (authError) {
-                console.error('Auth error:', authError)
                 throw new Error(authError.message)
             }
 
             if (!authData.user) {
-                throw new Error('No user returned from authentication')
+                throw new Error('Authentication failed')
             }
 
-            console.log('Step 1 Success: User authenticated', authData.user.email)
-            setDebugInfo(`Auth OK: ${authData.user.email}`)
+            setStep('Verifying admin access...')
 
-            // Step 2: Check if user is in admin_users table
-            // Using maybeSingle() instead of single() to handle no results gracefully
-            console.log('Step 2: Checking admin_users table...')
-
+            // Step 2: Try to check admin_users table directly
             const { data: adminData, error: adminError } = await supabase
                 .from('admin_users')
                 .select('id, email, role')
-                .eq('email', email.trim().toLowerCase())
+                .eq('email', normalizedEmail)
                 .maybeSingle()
 
-            console.log('Admin query result:', { adminData, adminError })
+            // If direct query works
+            if (adminData) {
+                setStep('Access granted!')
+                await new Promise(resolve => setTimeout(resolve, 500))
+                router.push('/admin/dashboard')
+                router.refresh()
+                return
+            }
 
+            // If direct query failed due to RLS, try RPC function
             if (adminError) {
-                console.error('Admin query error:', adminError)
-                // If RLS is blocking, try alternative approach
-                setDebugInfo(`DB Error: ${adminError.message}. Trying alternative...`)
+                console.log('Direct query failed, trying RPC...', adminError.message)
+                
+                const { data: isAdmin, error: rpcError } = await supabase
+                    .rpc('is_admin', { check_email: normalizedEmail })
 
-                // Alternative: Check using RPC function (if exists) or proceed anyway
-                // For now, we'll show a helpful error
-                await supabase.auth.signOut()
-                throw new Error(`Database error: ${adminError.message}. Please check RLS policies.`)
+                if (rpcError) {
+                    console.error('RPC error:', rpcError)
+                    await supabase.auth.signOut()
+                    throw new Error('Unable to verify admin status. Please check database setup.')
+                }
+
+                if (isAdmin) {
+                    setStep('Access granted!')
+                    await new Promise(resolve => setTimeout(resolve, 500))
+                    router.push('/admin/dashboard')
+                    router.refresh()
+                    return
+                }
             }
 
-            if (!adminData) {
-                console.log('No admin record found for:', email.trim().toLowerCase())
-                await supabase.auth.signOut()
-                throw new Error(`Email "${email.trim().toLowerCase()}" is not registered as admin. Please add it to admin_users table.`)
-            }
-
-            console.log('Step 2 Success: Admin verified', adminData)
-            setDebugInfo(`Admin verified: ${adminData.role}`)
-
-            // Step 3: Redirect to dashboard
-            console.log('Step 3: Redirecting to dashboard...')
-            router.push('/admin/dashboard')
-            router.refresh()
+            // No admin access found
+            await supabase.auth.signOut()
+            throw new Error(`"${normalizedEmail}" is not registered as admin.`)
 
         } catch (err: any) {
             console.error('Login error:', err)
-            setError(err.message || 'An error occurred during login')
+            setError(err.message || 'Login failed')
+            setStep('')
         } finally {
             setLoading(false)
         }
@@ -133,6 +139,7 @@ export default function AdminLoginPage() {
                                     required
                                     placeholder="admin@stayinubud.com"
                                     className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all"
+                                    disabled={loading}
                                 />
                             </div>
                         </div>
@@ -150,24 +157,35 @@ export default function AdminLoginPage() {
                                     required
                                     placeholder="Enter your password"
                                     className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all"
+                                    disabled={loading}
                                 />
                             </div>
                         </div>
 
                         {error && (
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-2">
+                            <motion.div 
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3"
+                            >
                                 <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
-                                <div>
-                                    <p className="text-sm text-red-700">{error}</p>
-                                </div>
-                            </div>
+                                <p className="text-sm text-red-700">{error}</p>
+                            </motion.div>
                         )}
 
-                        {debugInfo && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start space-x-2">
-                                <Info size={20} className="text-blue-500 flex-shrink-0 mt-0.5" />
-                                <p className="text-sm text-blue-700">{debugInfo}</p>
-                            </div>
+                        {step && !error && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center space-x-3"
+                            >
+                                {step === 'Access granted!' ? (
+                                    <CheckCircle size={20} className="text-green-500" />
+                                ) : (
+                                    <Loader2 size={20} className="text-blue-500 animate-spin" />
+                                )}
+                                <p className="text-sm text-blue-700">{step}</p>
+                            </motion.div>
                         )}
 
                         <motion.button
@@ -180,22 +198,13 @@ export default function AdminLoginPage() {
                             {loading ? (
                                 <>
                                     <Loader2 size={20} className="animate-spin" />
-                                    <span>Signing in...</span>
+                                    <span>Please wait...</span>
                                 </>
                             ) : (
                                 <span>Sign In</span>
                             )}
                         </motion.button>
                     </form>
-
-                    <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-xs text-amber-800">
-                            <strong>Setup Required:</strong><br />
-                            1. Create user in Supabase Auth<br />
-                            2. Add same email to <code className="bg-amber-100 px-1 rounded">admin_users</code> table<br />
-                            3. Run the SQL fix for RLS policies
-                        </p>
-                    </div>
 
                     <p className="text-center text-sm text-gray-600 mt-6">
                         Protected admin access only

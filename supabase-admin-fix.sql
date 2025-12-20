@@ -1,64 +1,73 @@
 -- ============================================
--- FIX ADMIN LOGIN - Run this in Supabase SQL Editor
+-- COMPLETE FIX untuk Admin Login
+-- Jalankan SEMUA query ini di Supabase SQL Editor
 -- ============================================
 
--- Drop existing restrictive policy
+-- =====================
+-- STEP 1: Hapus SEMUA policy lama
+-- =====================
 DROP POLICY IF EXISTS "Admins can view admin users" ON admin_users;
+DROP POLICY IF EXISTS "Users can check if they are admin" ON admin_users;
+DROP POLICY IF EXISTS "Admins can view all admin users" ON admin_users;
+DROP POLICY IF EXISTS "Admins can insert admin users" ON admin_users;
+DROP POLICY IF EXISTS "Admins can delete admin users" ON admin_users;
 
--- Create policy that allows authenticated users to read their own entry
--- This is needed for login verification
-CREATE POLICY "Users can check if they are admin" ON admin_users
-  FOR SELECT USING (
-    auth.jwt()->>'email' = email
-  );
+-- =====================
+-- STEP 2: Buat policy yang lebih simple
+-- Mengizinkan authenticated users untuk SELECT berdasarkan email mereka
+-- =====================
+CREATE POLICY "Authenticated users can check their admin status" ON admin_users
+  FOR SELECT 
+  TO authenticated
+  USING (email = auth.jwt()->>'email');
 
--- Create policy for admins to view all admin users
-CREATE POLICY "Admins can view all admin users" ON admin_users
-  FOR SELECT USING (
+-- Policy untuk admins mengelola admin_users
+CREATE POLICY "Admins can manage admin users" ON admin_users
+  FOR ALL
+  TO authenticated
+  USING (
     EXISTS (
-      SELECT 1 FROM admin_users au 
-      WHERE au.email = auth.jwt()->>'email'
-      AND au.role IN ('admin', 'super_admin')
+      SELECT 1 FROM admin_users WHERE email = auth.jwt()->>'email'
     )
   );
 
--- Admins can insert new admin users
-CREATE POLICY "Admins can insert admin users" ON admin_users
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM admin_users au 
-      WHERE au.email = auth.jwt()->>'email'
-    )
-  );
-
--- Admins can delete admin users (except themselves)
-CREATE POLICY "Admins can delete admin users" ON admin_users
-  FOR DELETE USING (
-    EXISTS (
-      SELECT 1 FROM admin_users au 
-      WHERE au.email = auth.jwt()->>'email'
-    )
-    AND email != auth.jwt()->>'email'
-  );
-
--- ============================================
--- INSERT YOUR FIRST ADMIN USER
--- Replace with YOUR email that you registered in Supabase Auth
--- ============================================
-
+-- =====================
+-- STEP 3: Pastikan email admin ada di tabel
+-- =====================
 INSERT INTO admin_users (email, role) 
-VALUES ('your-email@example.com', 'super_admin')
-ON CONFLICT (email) DO NOTHING;
+VALUES ('admin@stayinubud.com', 'super_admin')
+ON CONFLICT (email) DO UPDATE SET role = 'super_admin';
 
--- ============================================
--- VERIFICATION QUERIES
--- Run these to check if everything is set up correctly
--- ============================================
+-- =====================
+-- STEP 4: Buat function RPC untuk cek admin (bypass RLS jika perlu)
+-- =====================
+CREATE OR REPLACE FUNCTION is_admin(check_email TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM admin_users WHERE email = lower(check_email)
+  );
+END;
+$$;
 
--- Check if admin_users table exists and has data
+-- =====================
+-- STEP 5: Verifikasi
+-- =====================
+
+-- Cek data admin_users
 SELECT * FROM admin_users;
 
--- Check current policies on admin_users
-SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual 
-FROM pg_policies 
-WHERE tablename = 'admin_users';
+-- Cek policies yang aktif
+SELECT policyname, cmd, qual FROM pg_policies WHERE tablename = 'admin_users';
+
+-- =====================
+-- HASIL YANG DIHARAPKAN:
+-- 
+-- Dari SELECT * FROM admin_users:
+-- | id   | email                  | role        | created_at |
+-- | uuid | admin@stayinubud.com   | super_admin | timestamp  |
+-- 
+-- =====================
