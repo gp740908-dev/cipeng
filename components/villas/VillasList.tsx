@@ -15,7 +15,7 @@ export default function VillasList() {
     const [showFilters, setShowFilters] = useState(false)
 
     // Filter states
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000])
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000])
     const [minGuests, setMinGuests] = useState<number>(0)
     const [bedrooms, setBedrooms] = useState<number>(0)
 
@@ -71,7 +71,7 @@ export default function VillasList() {
     }
 
     function resetFilters() {
-        setPriceRange([0, 1000])
+        setPriceRange([0, 10000000])
         setMinGuests(0)
         setBedrooms(0)
     }
@@ -125,20 +125,20 @@ export default function VillasList() {
                             {/* Price Range */}
                             <div>
                                 <label className="block text-sm font-medium text-olive mb-2">
-                                    Price Range (per night)
+                                    Harga Maksimum (per malam)
                                 </label>
                                 <div className="space-y-2">
                                     <input
                                         type="range"
                                         min="0"
-                                        max="1000"
-                                        step="50"
+                                        max="10000000"
+                                        step="500000"
                                         value={priceRange[1]}
                                         onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
                                         className="w-full accent-sage"
                                     />
                                     <div className="text-sm text-gray-600">
-                                        Up to ${priceRange[1]}
+                                        Maks Rp{(priceRange[1] / 1000000).toFixed(1)} juta
                                     </div>
                                 </div>
                             </div>

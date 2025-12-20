@@ -189,7 +189,7 @@ INSERT INTO villas (name, description, bedrooms, bathrooms, max_guests, price_pe
   3,
   3,
   6,
-  250.00,
+  3950000,
   ARRAY['Private Pool', 'WiFi', 'Air Conditioning', 'Full Kitchen', 'Rice Field View', 'Parking', 'Garden', 'Outdoor Dining', 'BBQ Facilities', 'Daily Housekeeping'],
   ARRAY[
     'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=1200&q=80',
@@ -205,7 +205,7 @@ INSERT INTO villas (name, description, bedrooms, bathrooms, max_guests, price_pe
   2,
   2,
   4,
-  180.00,
+  2850000,
   ARRAY['Plunge Pool', 'WiFi', 'Outdoor Bath', 'Jungle View', 'Air Conditioning', 'Yoga Deck', 'Garden', 'Eco-Friendly', 'Breakfast Included', 'Parking'],
   ARRAY[
     'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80',
@@ -221,7 +221,7 @@ INSERT INTO villas (name, description, bedrooms, bathrooms, max_guests, price_pe
   4,
   4,
   8,
-  350.00,
+  5500000,
   ARRAY['Infinity Pool', 'Valley View', 'WiFi', 'Full Kitchen', 'Air Conditioning', 'Media Room', 'Spa Room', 'Butler Service', 'Chef Available', 'Parking', 'Garden', 'Gym'],
   ARRAY[
     'https://images.unsplash.com/photo-1615880480668-7c0f10c4f9de?w=1200&q=80',
@@ -237,7 +237,7 @@ INSERT INTO villas (name, description, bedrooms, bathrooms, max_guests, price_pe
   2,
   2,
   4,
-  200.00,
+  3150000,
   ARRAY['Private Pool', 'Rice Terrace View', 'WiFi', 'Garden', 'Air Conditioning', 'Kitchen', 'Parking', 'Outdoor Dining', 'Lotus Pond', 'Daily Housekeeping'],
   ARRAY[
     'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&q=80',
