@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { Menu, X, Phone } from 'lucide-react'
+import { Menu, X, Phone, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 
@@ -52,41 +52,48 @@ export default function Navbar() {
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12">
                     <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="relative z-10">
-                            <AnimatePresence mode="wait">
-                                {isTransparent ? (
-                                    /* Image Logo - When at top */
-                                    <motion.div
-                                        key="image-logo"
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.8 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="relative"
-                                    >
-                                        <Image
-                                            src="/images/logo.png"
-                                            alt="StayinUBUD"
-                                            width={120}
-                                            height={80}
-                                            className="h-16 md:h-20 w-auto object-contain brightness-0 invert"
-                                            priority
-                                        />
-                                    </motion.div>
-                                ) : (
-                                    /* Text Logo - When scrolled */
-                                    <motion.span
-                                        key="text-logo"
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="font-display text-2xl md:text-3xl tracking-tight text-gray-900"
-                                    >
-                                        Stayin<span className="text-olive-600">UBUD</span>
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
+                        <Link href="/" className="relative z-10 h-12 md:h-14 flex items-center">
+                            {/* Container with fixed height for smooth transition */}
+                            <div className="relative w-32 md:w-40 h-full flex items-center">
+                                {/* Image Logo - Always rendered, opacity controlled */}
+                                <motion.div
+                                    animate={{
+                                        opacity: isTransparent ? 1 : 0,
+                                        scale: isTransparent ? 1 : 0.9,
+                                    }}
+                                    transition={{
+                                        duration: 0.4,
+                                        ease: [0.16, 1, 0.3, 1]
+                                    }}
+                                    className="absolute inset-0 flex items-center"
+                                    style={{ pointerEvents: isTransparent ? 'auto' : 'none' }}
+                                >
+                                    <Image
+                                        src="/images/logo.png"
+                                        alt="StayinUBUD"
+                                        width={140}
+                                        height={80}
+                                        className="h-10 md:h-12 w-auto object-contain brightness-0 invert"
+                                        priority
+                                    />
+                                </motion.div>
+
+                                {/* Text Logo - Always rendered, opacity controlled */}
+                                <motion.span
+                                    animate={{
+                                        opacity: isTransparent ? 0 : 1,
+                                        y: isTransparent ? -5 : 0,
+                                    }}
+                                    transition={{
+                                        duration: 0.4,
+                                        ease: [0.16, 1, 0.3, 1]
+                                    }}
+                                    className="font-display text-2xl md:text-3xl tracking-tight text-gray-900 whitespace-nowrap"
+                                    style={{ pointerEvents: isTransparent ? 'none' : 'auto' }}
+                                >
+                                    Stayin<span className="text-olive-600">UBUD</span>
+                                </motion.span>
+                            </div>
                         </Link>
 
                         {/* Desktop Menu */}
@@ -124,17 +131,19 @@ export default function Navbar() {
                                 <Phone size={14} />
                                 <span className="hidden xl:inline">+62 812 3456 7890</span>
                             </a>
-                            <Link
-                                href="/villas"
-                                className={`text-xs tracking-[0.15em] uppercase px-6 py-3 transition-all duration-300
+                            <a
+                                href="mailto:info@stayinubud.com"
+                                className={`flex items-center gap-2 text-xs tracking-[0.15em] uppercase px-6 py-3 transition-all duration-300
                                     ${isTransparent
                                         ? 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-olive-600 hover:border-olive-600'
                                         : 'bg-olive-900 text-white hover:bg-olive-600'
                                     }
                                 `}
                             >
-                                Book Now
-                            </Link>
+                                <Mail size={14} />
+                                <span className="hidden xl:inline">info@stayinubud.com</span>
+                                <span className="xl:hidden">Email Us</span>
+                            </a>
                         </div>
 
                         {/* Mobile Menu Button */}
