@@ -9,6 +9,8 @@ import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, ArrowLef
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import ModernBookingFlow from '@/components/ModernBookingFlow'
+import AvailabilityCalendar from '@/components/AvailabilityCalendar'
+import NearbyPlaces from '@/components/NearbyPlaces'
 
 // Dynamic import for map (no SSR)
 const VillaMap = dynamic(() => import('@/components/VillaMap'), {
@@ -224,6 +226,26 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                 />
                             </motion.div>
                         )}
+
+                        {/* Nearby Places */}
+                        {villa.nearby_places && villa.nearby_places.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.7 }}
+                            >
+                                <NearbyPlaces places={villa.nearby_places} />
+                            </motion.div>
+                        )}
+
+                        {/* Availability Calendar */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.8 }}
+                        >
+                            <AvailabilityCalendar villaId={villa.id} />
+                        </motion.div>
                     </div>
 
                     {/* Right: Booking Card */}

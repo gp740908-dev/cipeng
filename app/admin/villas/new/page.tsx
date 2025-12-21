@@ -8,10 +8,23 @@ import {
     Plus,
     X,
     Loader2,
-    MapPin
+    MapPin,
+    Navigation
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { NearbyPlace } from '@/types'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+
+const placeTypes = [
+    { value: 'beach', label: 'Beach' },
+    { value: 'temple', label: 'Temple' },
+    { value: 'attraction', label: 'Attraction' },
+    { value: 'restaurant', label: 'Restaurant' },
+    { value: 'shopping', label: 'Shopping' },
+    { value: 'landmark', label: 'Landmark' },
+    { value: 'airport', label: 'Airport' },
+    { value: 'other', label: 'Other' },
+]
 
 export default function AddVillaPage() {
     const router = useRouter()
@@ -30,6 +43,7 @@ export default function AddVillaPage() {
         longitude: 115.2624,
         amenities: ['WiFi', 'Private Pool', 'Air Conditioning'],
         images: [''],
+        nearby_places: [] as NearbyPlace[],
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,6 +76,7 @@ export default function AddVillaPage() {
                     longitude: formData.longitude || null,
                     amenities: formData.amenities.filter(a => a.trim()),
                     images: formData.images.filter(img => img.trim()),
+                    nearby_places: formData.nearby_places.filter(p => p.name.trim()),
                 })
 
             if (error) throw error
@@ -75,6 +90,7 @@ export default function AddVillaPage() {
         }
     }
 
+    // Image handlers
     const addImageField = () => {
         setFormData({ ...formData, images: [...formData.images, ''] })
     }
@@ -92,6 +108,7 @@ export default function AddVillaPage() {
         setFormData({ ...formData, images: newImages })
     }
 
+    // Amenity handlers
     const addAmenity = () => {
         setFormData({ ...formData, amenities: [...formData.amenities, ''] })
     }
@@ -107,6 +124,27 @@ export default function AddVillaPage() {
         const newAmenities = [...formData.amenities]
         newAmenities[index] = value
         setFormData({ ...formData, amenities: newAmenities })
+    }
+
+    // Nearby Places handlers
+    const addNearbyPlace = () => {
+        setFormData({
+            ...formData,
+            nearby_places: [...formData.nearby_places, { name: '', type: 'attraction', distance: '' }]
+        })
+    }
+
+    const removeNearbyPlace = (index: number) => {
+        setFormData({
+            ...formData,
+            nearby_places: formData.nearby_places.filter((_, i) => i !== index)
+        })
+    }
+
+    const updateNearbyPlace = (index: number, field: keyof NearbyPlace, value: string) => {
+        const newPlaces = [...formData.nearby_places]
+        newPlaces[index] = { ...newPlaces[index], [field]: value }
+        setFormData({ ...formData, nearby_places: newPlaces })
     }
 
     return (
@@ -342,6 +380,61 @@ export default function AddVillaPage() {
                                     >
                                         <Plus size={16} />
                                         <span>Tambah Fasilitas</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Nearby Places */}
+                            <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Navigation size={16} className="text-blue-600" />
+                                    <span className="text-sm font-medium text-gray-700">Tempat Terdekat</span>
+                                </div>
+                                <p className="text-xs text-gray-500 mb-4">
+                                    Tambahkan tempat-tempat menarik di sekitar villa (pantai, kuil, restoran, dll)
+                                </p>
+                                <div className="space-y-3">
+                                    {formData.nearby_places.map((place, index) => (
+                                        <div key={index} className="flex gap-2 bg-white p-3 border border-gray-100">
+                                            <input
+                                                type="text"
+                                                value={place.name}
+                                                onChange={(e) => updateNearbyPlace(index, 'name', e.target.value)}
+                                                placeholder="Nama tempat"
+                                                className="flex-1 px-3 py-2 border border-gray-200 focus:border-olive-600 outline-none transition-colors text-sm"
+                                            />
+                                            <select
+                                                value={place.type}
+                                                onChange={(e) => updateNearbyPlace(index, 'type', e.target.value)}
+                                                className="px-3 py-2 border border-gray-200 focus:border-olive-600 outline-none transition-colors text-sm"
+                                            >
+                                                {placeTypes.map(t => (
+                                                    <option key={t.value} value={t.value}>{t.label}</option>
+                                                ))}
+                                            </select>
+                                            <input
+                                                type="text"
+                                                value={place.distance}
+                                                onChange={(e) => updateNearbyPlace(index, 'distance', e.target.value)}
+                                                placeholder="1.5 km"
+                                                className="w-24 px-3 py-2 border border-gray-200 focus:border-olive-600 outline-none transition-colors text-sm"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeNearbyPlace(index)}
+                                                className="p-2 text-red-500 hover:bg-red-50"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={addNearbyPlace}
+                                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
+                                    >
+                                        <Plus size={16} />
+                                        <span>Tambah Tempat Terdekat</span>
                                     </button>
                                 </div>
                             </div>

@@ -1,3 +1,9 @@
+export interface NearbyPlace {
+    name: string
+    type: 'beach' | 'temple' | 'attraction' | 'restaurant' | 'shopping' | 'landmark' | 'airport' | 'other'
+    distance: string
+}
+
 export interface Villa {
     id: string
     name: string
@@ -11,6 +17,7 @@ export interface Villa {
     location: string
     latitude: number | null
     longitude: number | null
+    nearby_places: NearbyPlace[]
     created_at: string
     updated_at: string
 }
