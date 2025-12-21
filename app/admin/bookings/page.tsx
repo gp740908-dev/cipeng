@@ -20,10 +20,12 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import { differenceInDays, parseISO, format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 export default function AdminBookingsPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [bookings, setBookings] = useState<Booking[]>([])
@@ -70,6 +72,7 @@ export default function AdminBookingsPage() {
 
             if (error) throw error
 
+            toast.success(status === 'confirmed' ? 'Booking dikonfirmasi' : 'Booking dibatalkan')
             setBookings(bookings.map(b =>
                 b.id === id ? { ...b, status } : b
             ))
@@ -77,9 +80,9 @@ export default function AdminBookingsPage() {
             if (selectedBooking?.id === id) {
                 setSelectedBooking({ ...selectedBooking, status })
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating booking:', error)
-            alert('Gagal mengupdate status')
+            toast.error('Gagal mengupdate status', error.message)
         } finally {
             setUpdatingId(null)
         }

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 interface SettingsData {
     general: {
@@ -58,6 +59,7 @@ const defaultSettings: SettingsData = {
 export default function SettingsPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -102,11 +104,10 @@ export default function SettingsPage() {
 
     async function handleSave() {
         setSaving(true)
+        const loadingId = toast.loading('Menyimpan pengaturan...')
         try {
             // Save each settings group
             for (const [key, value] of Object.entries(settings)) {
-                console.log(`Saving ${key}:`, value)
-
                 // First try to update
                 const { data: existingData } = await supabase
                     .from('site_settings')
@@ -135,10 +136,10 @@ export default function SettingsPage() {
                     throw error
                 }
             }
-            alert('Pengaturan berhasil disimpan!')
+            toast.update(loadingId, { type: 'success', title: 'Pengaturan berhasil disimpan!' })
         } catch (error: any) {
             console.error('Error saving settings:', error)
-            alert(`Gagal menyimpan pengaturan: ${error.message || 'Unknown error'}`)
+            toast.update(loadingId, { type: 'error', title: 'Gagal menyimpan pengaturan', message: error.message })
         } finally {
             setSaving(false)
         }

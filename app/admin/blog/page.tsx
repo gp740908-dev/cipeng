@@ -19,10 +19,12 @@ import { BlogPost } from '@/types'
 import { format, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 export default function AdminBlogPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [posts, setPosts] = useState<BlogPost[]>([])
@@ -69,10 +71,11 @@ export default function AdminBlogPage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success('Artikel berhasil dihapus')
             setPosts(posts.filter(p => p.id !== id))
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting post:', error)
-            alert('Gagal menghapus artikel')
+            toast.error('Gagal menghapus artikel', error.message)
         } finally {
             setDeleting(null)
         }
@@ -87,12 +90,13 @@ export default function AdminBlogPage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success(currentStatus ? 'Artikel di-unpublish' : 'Artikel dipublish')
             setPosts(posts.map(p =>
                 p.id === id ? { ...p, published: !currentStatus } : p
             ))
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error toggling post:', error)
-            alert('Gagal mengubah status')
+            toast.error('Gagal mengubah status', error.message)
         } finally {
             setToggling(null)
         }

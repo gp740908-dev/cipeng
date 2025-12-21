@@ -17,10 +17,12 @@ import { AdminUser } from '@/types'
 import { format, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 export default function AdminUsersPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [users, setUsers] = useState<AdminUser[]>([])
@@ -63,7 +65,7 @@ export default function AdminUsersPage() {
 
     async function handleDelete(id: string, email: string) {
         if (email === currentUserEmail) {
-            alert('Anda tidak bisa menghapus akun sendiri')
+            toast.warning('Anda tidak bisa menghapus akun sendiri')
             return
         }
 
@@ -77,10 +79,11 @@ export default function AdminUsersPage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success('Admin berhasil dihapus')
             setUsers(users.filter(u => u.id !== id))
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting user:', error)
-            alert('Gagal menghapus admin')
+            toast.error('Gagal menghapus admin', error.message)
         } finally {
             setDeleting(null)
         }
@@ -90,7 +93,7 @@ export default function AdminUsersPage() {
         e.preventDefault()
 
         if (!newEmail.trim()) {
-            alert('Email wajib diisi')
+            toast.warning('Email wajib diisi')
             return
         }
 
@@ -105,6 +108,7 @@ export default function AdminUsersPage() {
 
             if (error) throw error
 
+            toast.success('Admin berhasil ditambahkan')
             setNewEmail('')
             setNewRole('admin')
             setShowAddModal(false)
@@ -112,9 +116,9 @@ export default function AdminUsersPage() {
         } catch (error: any) {
             console.error('Error adding user:', error)
             if (error.code === '23505') {
-                alert('Email sudah terdaftar sebagai admin')
+                toast.error('Email sudah terdaftar sebagai admin')
             } else {
-                alert('Gagal menambahkan admin')
+                toast.error('Gagal menambahkan admin', error.message)
             }
         } finally {
             setAdding(false)

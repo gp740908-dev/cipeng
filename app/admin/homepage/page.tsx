@@ -20,10 +20,12 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import { Villa, HeroSlide } from '@/types'
+import { useToast } from '@/components/ui/Toast'
 
 export default function HomepagePage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -77,7 +79,7 @@ export default function HomepagePage() {
 
     async function addHeroSlide() {
         if (!selectedVillaId) {
-            alert('Pilih villa terlebih dahulu')
+            toast.warning('Pilih villa terlebih dahulu')
             return
         }
 
@@ -95,14 +97,15 @@ export default function HomepagePage() {
 
             if (error) throw error
 
+            toast.success('Slide berhasil ditambahkan')
             setShowAddModal(false)
             setSelectedVillaId('')
             setCustomTagline('')
             setCustomDescription('')
             fetchData()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error adding slide:', error)
-            alert('Gagal menambah slide')
+            toast.error('Gagal menambah slide', error.message)
         } finally {
             setSaving(false)
         }
@@ -118,9 +121,11 @@ export default function HomepagePage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success('Slide berhasil dihapus')
             fetchData()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error removing slide:', error)
+            toast.error('Gagal menghapus slide', error.message)
         }
     }
 
@@ -321,8 +326,8 @@ export default function HomepagePage() {
                                     <div
                                         key={villa.id}
                                         className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${isFeatured
-                                                ? 'border-olive-600 bg-olive-50'
-                                                : 'border-gray-200 hover:border-gray-300'
+                                            ? 'border-olive-600 bg-olive-50'
+                                            : 'border-gray-200 hover:border-gray-300'
                                             }`}
                                         onClick={() => toggleFeaturedVilla(villa.id)}
                                     >

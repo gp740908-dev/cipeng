@@ -16,10 +16,12 @@ import {
     Eye
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/Toast'
 
 export default function NewBlogPostPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -51,7 +53,7 @@ export default function NewBlogPostPage() {
         e.preventDefault()
 
         if (!formData.title || !formData.content) {
-            alert('Judul dan konten wajib diisi')
+            toast.warning('Judul dan konten wajib diisi')
             return
         }
 
@@ -72,10 +74,11 @@ export default function NewBlogPostPage() {
 
             if (error) throw error
 
+            toast.success('Artikel berhasil dibuat')
             router.push('/admin/blog')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating post:', error)
-            alert('Gagal membuat artikel')
+            toast.error('Gagal membuat artikel', error.message)
         } finally {
             setLoading(false)
         }

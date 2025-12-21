@@ -18,6 +18,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import { Experience } from '@/types'
+import { useToast } from '@/components/ui/Toast'
 
 const categories = [
     { value: 'wellness', label: 'Wellness' },
@@ -42,6 +43,7 @@ const defaultExperience: Partial<Experience> = {
 export default function ExperiencesPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [experiences, setExperiences] = useState<Experience[]>([])
@@ -92,7 +94,7 @@ export default function ExperiencesPage() {
 
     async function handleSave() {
         if (!formData.title) {
-            alert('Title wajib diisi')
+            toast.warning('Title wajib diisi')
             return
         }
 
@@ -109,6 +111,7 @@ export default function ExperiencesPage() {
                     .eq('id', editingId)
 
                 if (error) throw error
+                toast.success('Experience berhasil diperbarui')
             } else {
                 // Create
                 const { error } = await supabase
@@ -116,13 +119,14 @@ export default function ExperiencesPage() {
                     .insert([formData])
 
                 if (error) throw error
+                toast.success('Experience berhasil ditambahkan')
             }
 
             setShowModal(false)
             fetchExperiences()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving experience:', error)
-            alert('Gagal menyimpan experience')
+            toast.error('Gagal menyimpan experience', error.message)
         } finally {
             setSaving(false)
         }
@@ -139,10 +143,11 @@ export default function ExperiencesPage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success('Experience berhasil dihapus')
             fetchExperiences()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting experience:', error)
-            alert('Gagal menghapus experience')
+            toast.error('Gagal menghapus experience', error.message)
         } finally {
             setDeleting(null)
         }

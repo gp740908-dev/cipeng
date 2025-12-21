@@ -18,10 +18,12 @@ import { Testimonial } from '@/types'
 import { format, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 export default function AdminTestimonialsPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [testimonials, setTestimonials] = useState<Testimonial[]>([])
@@ -80,10 +82,11 @@ export default function AdminTestimonialsPage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success('Testimonial berhasil dihapus')
             setTestimonials(testimonials.filter(t => t.id !== id))
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting testimonial:', error)
-            alert('Gagal menghapus testimonial')
+            toast.error('Gagal menghapus testimonial', error.message)
         } finally {
             setDeleting(null)
         }
@@ -137,6 +140,7 @@ export default function AdminTestimonialsPage() {
                     .eq('id', editing.id)
 
                 if (error) throw error
+                toast.success('Testimonial berhasil diperbarui')
             } else {
                 const { error } = await supabase
                     .from('testimonials')
@@ -151,13 +155,14 @@ export default function AdminTestimonialsPage() {
                     })
 
                 if (error) throw error
+                toast.success('Testimonial berhasil ditambahkan')
             }
 
             setShowModal(false)
             fetchTestimonials()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving testimonial:', error)
-            alert('Gagal menyimpan testimonial')
+            toast.error('Gagal menyimpan testimonial', error.message)
         } finally {
             setSaving(false)
         }

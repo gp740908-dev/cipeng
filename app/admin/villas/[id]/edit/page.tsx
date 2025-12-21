@@ -15,6 +15,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { NearbyPlace } from '@/types'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 const placeTypes = [
     { value: 'beach', label: 'Beach' },
@@ -32,6 +33,7 @@ export default function EditVillaPage() {
     const params = useParams()
     const villaId = params.id as string
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -80,9 +82,9 @@ export default function EditVillaPage() {
                     nearby_places: data.nearby_places || [],
                 })
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching villa:', error)
-            alert('Villa tidak ditemukan')
+            toast.error('Villa tidak ditemukan')
             router.push('/admin/villas')
         } finally {
             setLoading(false)
@@ -93,7 +95,7 @@ export default function EditVillaPage() {
         e.preventDefault()
 
         if (!formData.name || !formData.description) {
-            alert('Nama dan deskripsi wajib diisi')
+            toast.warning('Nama dan deskripsi wajib diisi')
             return
         }
 
@@ -120,10 +122,11 @@ export default function EditVillaPage() {
 
             if (error) throw error
 
+            toast.success('Perubahan berhasil disimpan')
             router.push('/admin/villas')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating villa:', error)
-            alert('Gagal menyimpan perubahan')
+            toast.error('Gagal menyimpan perubahan', error.message)
         } finally {
             setSaving(false)
         }

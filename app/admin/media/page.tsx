@@ -21,12 +21,14 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import { Media } from '@/types'
+import { useToast } from '@/components/ui/Toast'
 
 const folders = ['general', 'villas', 'experiences', 'blog', 'testimonials']
 
 export default function MediaLibraryPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [loading, setLoading] = useState(true)
@@ -79,6 +81,7 @@ export default function MediaLibraryPage() {
         if (!files || files.length === 0) return
 
         setUploading(true)
+        const loadingId = toast.loading('Mengupload file...')
 
         try {
             for (const file of Array.from(files)) {
@@ -114,10 +117,11 @@ export default function MediaLibraryPage() {
                 if (dbError) throw dbError
             }
 
+            toast.update(loadingId, { type: 'success', title: `${files.length} file berhasil diupload` })
             fetchMedia()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error uploading:', error)
-            alert('Gagal mengupload file')
+            toast.update(loadingId, { type: 'error', title: 'Gagal mengupload file', message: error.message })
         } finally {
             setUploading(false)
             if (fileInputRef.current) {
@@ -143,11 +147,12 @@ export default function MediaLibraryPage() {
 
             if (error) throw error
 
+            toast.success('File berhasil dihapus')
             setSelectedMedia(null)
             fetchMedia()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting:', error)
-            alert('Gagal menghapus file')
+            toast.error('Gagal menghapus file', error.message)
         } finally {
             setDeleting(null)
         }
@@ -156,6 +161,7 @@ export default function MediaLibraryPage() {
     function copyUrl(url: string, id: string) {
         navigator.clipboard.writeText(url)
         setCopiedId(id)
+        toast.success('URL disalin ke clipboard')
         setTimeout(() => setCopiedId(null), 2000)
     }
 

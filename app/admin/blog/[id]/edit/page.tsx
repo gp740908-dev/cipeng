@@ -15,12 +15,14 @@ import {
     Users
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/Toast'
 
 export default function EditBlogPostPage() {
     const router = useRouter()
     const params = useParams()
     const postId = params.id as string
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -59,9 +61,9 @@ export default function EditBlogPostPage() {
                     published: data.published,
                 })
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error fetching post:', error)
-            alert('Artikel tidak ditemukan')
+            toast.error('Artikel tidak ditemukan')
             router.push('/admin/blog')
         } finally {
             setLoading(false)
@@ -72,7 +74,7 @@ export default function EditBlogPostPage() {
         e.preventDefault()
 
         if (!formData.title || !formData.content) {
-            alert('Judul dan konten wajib diisi')
+            toast.warning('Judul dan konten wajib diisi')
             return
         }
 
@@ -94,10 +96,11 @@ export default function EditBlogPostPage() {
 
             if (error) throw error
 
+            toast.success('Perubahan berhasil disimpan')
             router.push('/admin/blog')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating post:', error)
-            alert('Gagal menyimpan perubahan')
+            toast.error('Gagal menyimpan perubahan', error.message)
         } finally {
             setSaving(false)
         }

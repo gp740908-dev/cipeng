@@ -14,6 +14,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { NearbyPlace } from '@/types'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 const placeTypes = [
     { value: 'beach', label: 'Beach' },
@@ -29,6 +30,7 @@ const placeTypes = [
 export default function AddVillaPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -50,12 +52,12 @@ export default function AddVillaPage() {
         e.preventDefault()
 
         if (!formData.name || !formData.description) {
-            alert('Nama dan deskripsi wajib diisi')
+            toast.warning('Nama dan deskripsi wajib diisi')
             return
         }
 
         if (formData.images.filter(img => img.trim()).length === 0) {
-            alert('Minimal 1 gambar wajib diisi')
+            toast.warning('Minimal 1 gambar wajib diisi')
             return
         }
 
@@ -81,10 +83,11 @@ export default function AddVillaPage() {
 
             if (error) throw error
 
+            toast.success('Villa berhasil ditambahkan')
             router.push('/admin/villas')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error adding villa:', error)
-            alert('Gagal menambahkan villa')
+            toast.error('Gagal menambahkan villa', error.message)
         } finally {
             setLoading(false)
         }

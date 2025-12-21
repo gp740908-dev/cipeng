@@ -17,10 +17,12 @@ import { createClient } from '@/lib/supabase/client'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { useToast } from '@/components/ui/Toast'
 
 export default function AdminVillasPage() {
     const router = useRouter()
     const supabase = createClient()
+    const toast = useToast()
 
     const [loading, setLoading] = useState(true)
     const [villas, setVillas] = useState<Villa[]>([])
@@ -66,10 +68,11 @@ export default function AdminVillasPage() {
                 .eq('id', id)
 
             if (error) throw error
+            toast.success('Villa berhasil dihapus')
             setVillas(villas.filter(v => v.id !== id))
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting villa:', error)
-            alert('Gagal menghapus villa')
+            toast.error('Gagal menghapus villa', error.message)
         } finally {
             setDeleting(null)
         }
