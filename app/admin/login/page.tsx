@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Lock, Mail, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
+import { Lock, Mail, Loader2, AlertCircle, CheckCircle, Leaf } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function AdminLoginPage() {
     const router = useRouter()
@@ -26,7 +27,6 @@ export default function AdminLoginPage() {
         const normalizedEmail = email.trim().toLowerCase()
 
         try {
-            // Step 1: Sign in with Supabase Auth
             setStep('Authenticating...')
             const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                 email: normalizedEmail,
@@ -43,14 +43,12 @@ export default function AdminLoginPage() {
 
             setStep('Verifying admin access...')
 
-            // Step 2: Try to check admin_users table directly
             const { data: adminData, error: adminError } = await supabase
                 .from('admin_users')
                 .select('id, email, role')
                 .eq('email', normalizedEmail)
                 .maybeSingle()
 
-            // If direct query works
             if (adminData) {
                 setStep('Access granted!')
                 await new Promise(resolve => setTimeout(resolve, 500))
@@ -59,10 +57,9 @@ export default function AdminLoginPage() {
                 return
             }
 
-            // If direct query failed due to RLS, try RPC function
             if (adminError) {
                 console.log('Direct query failed, trying RPC...', adminError.message)
-                
+
                 const { data: isAdmin, error: rpcError } = await supabase
                     .rpc('is_admin', { check_email: normalizedEmail })
 
@@ -81,7 +78,6 @@ export default function AdminLoginPage() {
                 }
             }
 
-            // No admin access found
             await supabase.auth.signOut()
             throw new Error(`"${normalizedEmail}" is not registered as admin.`)
 
@@ -95,126 +91,167 @@ export default function AdminLoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-cream via-sage-light/20 to-olive/10 flex items-center justify-center p-4">
-            {/* Back to Home */}
-            <Link
-                href="/"
-                className="absolute top-8 left-8 text-olive hover:text-sage transition-colors font-medium"
-            >
-                ← Back to Home
-            </Link>
-
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md"
-            >
-                {/* Logo */}
-                <div className="text-center mb-8">
-                    <h1 className="font-knewave text-4xl text-sage mb-2">StayinUBUD</h1>
-                    <p className="text-gray-600">Admin Panel</p>
+        <div className="min-h-screen bg-olive-100/50 flex">
+            {/* Left Side - Decorative */}
+            <div className="hidden lg:flex lg:w-1/2 bg-olive-900 relative overflow-hidden">
+                <div className="absolute inset-0">
+                    <Image
+                        src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
+                        alt="Villa"
+                        fill
+                        className="object-cover opacity-30"
+                    />
                 </div>
+                <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+                    <div>
+                        <Link href="/" className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-olive-600 flex items-center justify-center">
+                                <Leaf size={20} className="text-white" />
+                            </div>
+                            <span className="font-display text-2xl text-white">StayinUBUD</span>
+                        </Link>
+                    </div>
+                    <div>
+                        <h2 className="font-display text-4xl text-white mb-4">
+                            Welcome to <br />
+                            <span className="italic text-olive-400">Admin Panel</span>
+                        </h2>
+                        <p className="text-white/60 max-w-sm">
+                            Manage your villas, bookings, and content from one centralized dashboard.
+                        </p>
+                    </div>
+                    <div className="text-white/40 text-sm">
+                        © 2024 StayinUBUD. All rights reserved.
+                    </div>
+                </div>
+            </div>
 
-                {/* Login Card */}
-                <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
-                    <div className="flex items-center justify-center w-16 h-16 bg-sage/10 rounded-full mx-auto mb-6">
-                        <Lock size={32} className="text-sage" />
+            {/* Right Side - Login Form */}
+            <div className="flex-1 flex items-center justify-center p-8">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="w-full max-w-md"
+                >
+                    {/* Mobile Logo */}
+                    <div className="text-center mb-8 lg:hidden">
+                        <Link href="/" className="inline-flex items-center gap-2">
+                            <div className="w-10 h-10 bg-olive-900 flex items-center justify-center">
+                                <Leaf size={20} className="text-white" />
+                            </div>
+                            <span className="font-display text-2xl text-gray-900">StayinUBUD</span>
+                        </Link>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-olive text-center mb-8">
-                        Admin Login
-                    </h2>
-
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    placeholder="admin@stayinubud.com"
-                                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all"
-                                    disabled={loading}
-                                />
-                            </div>
+                    {/* Login Card */}
+                    <div className="bg-white p-8 md:p-10 shadow-xl">
+                        <div className="flex items-center justify-center w-14 h-14 bg-olive-100 mx-auto mb-6">
+                            <Lock size={24} className="text-olive-600" />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    placeholder="Enter your password"
-                                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all"
-                                    disabled={loading}
-                                />
+                        <h2 className="text-xl font-display text-gray-900 text-center mb-2">
+                            Admin Login
+                        </h2>
+                        <p className="text-gray-500 text-sm text-center mb-8">
+                            Enter your credentials to access dashboard
+                        </p>
+
+                        <form onSubmit={handleLogin} className="space-y-5">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                                    Email Address
+                                </label>
+                                <div className="relative">
+                                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                        placeholder="admin@stayinubud.com"
+                                        className="w-full pl-12 pr-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
+                                        disabled={loading}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        {error && (
-                            <motion.div 
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3"
-                            >
-                                <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
-                                <p className="text-sm text-red-700">{error}</p>
-                            </motion.div>
-                        )}
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        placeholder="Enter your password"
+                                        className="w-full pl-12 pr-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
+                                        disabled={loading}
+                                    />
+                                </div>
+                            </div>
 
-                        {step && !error && (
-                            <motion.div 
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center space-x-3"
-                            >
-                                {step === 'Access granted!' ? (
-                                    <CheckCircle size={20} className="text-green-500" />
-                                ) : (
-                                    <Loader2 size={20} className="text-blue-500 animate-spin" />
-                                )}
-                                <p className="text-sm text-blue-700">{step}</p>
-                            </motion.div>
-                        )}
-
-                        <motion.button
-                            whileHover={{ scale: loading ? 1 : 1.02 }}
-                            whileTap={{ scale: loading ? 1 : 0.98 }}
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-sage text-white py-3 rounded-lg font-semibold hover:bg-sage-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 size={20} className="animate-spin" />
-                                    <span>Please wait...</span>
-                                </>
-                            ) : (
-                                <span>Sign In</span>
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-red-50 border border-red-200 p-4 flex items-start gap-3"
+                                >
+                                    <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
+                                    <p className="text-sm text-red-700">{error}</p>
+                                </motion.div>
                             )}
-                        </motion.button>
-                    </form>
 
-                    <p className="text-center text-sm text-gray-600 mt-6">
-                        Protected admin access only
+                            {step && !error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-olive-100 border border-olive-200 p-4 flex items-center gap-3"
+                                >
+                                    {step === 'Access granted!' ? (
+                                        <CheckCircle size={18} className="text-olive-600" />
+                                    ) : (
+                                        <Loader2 size={18} className="text-olive-600 animate-spin" />
+                                    )}
+                                    <p className="text-sm text-olive-900">{step}</p>
+                                </motion.div>
+                            )}
+
+                            <motion.button
+                                whileHover={{ scale: loading ? 1 : 1.01 }}
+                                whileTap={{ scale: loading ? 1 : 0.99 }}
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-olive-900 text-white py-3 font-medium text-sm tracking-wider uppercase hover:bg-olive-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 size={18} className="animate-spin" />
+                                        <span>Please wait...</span>
+                                    </>
+                                ) : (
+                                    <span>Sign In</span>
+                                )}
+                            </motion.button>
+                        </form>
+
+                        <div className="mt-6 pt-6 border-t border-gray-100">
+                            <Link
+                                href="/"
+                                className="block text-center text-sm text-gray-500 hover:text-olive-600 transition-colors"
+                            >
+                                ← Back to Website
+                            </Link>
+                        </div>
+                    </div>
+
+                    <p className="text-center text-xs text-gray-400 mt-6 lg:hidden">
+                        © 2024 StayinUBUD. All rights reserved.
                     </p>
-                </div>
-
-                <p className="text-center text-xs text-gray-500 mt-8">
-                    © 2024 StayinUBUD. All rights reserved.
-                </p>
-            </motion.div>
+                </motion.div>
+            </div>
         </div>
     )
 }

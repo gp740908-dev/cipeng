@@ -6,21 +6,17 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
     Home,
-    Calendar,
-    TrendingUp,
-    LogOut,
     Plus,
     Edit,
     Trash2,
     Eye,
     Loader2,
-    FileText,
-    Users
 } from 'lucide-react'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
+import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default function AdminVillasPage() {
     const router = useRouter()
@@ -79,95 +75,58 @@ export default function AdminVillasPage() {
         }
     }
 
-    async function handleLogout() {
-        await supabase.auth.signOut()
-        router.push('/admin/login')
-    }
-
-    const menuItems = [
-        { href: '/admin/dashboard', icon: TrendingUp, label: 'Dashboard' },
-        { href: '/admin/villas', icon: Home, label: 'Kelola Villa', active: true },
-        { href: '/admin/bookings', icon: Calendar, label: 'Kelola Booking' },
-        { href: '/admin/blog', icon: FileText, label: 'Kelola Blog' },
-        { href: '/admin/users', icon: Users, label: 'Admin Users' },
-    ]
-
     return (
         <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-olive text-cream p-6 flex flex-col">
-                <div className="mb-8">
-                    <h1 className="font-knewave text-3xl text-sage">StayinUBUD</h1>
-                    <p className="text-sm text-cream/70">Admin Panel</p>
-                </div>
-
-                <nav className="flex-1 space-y-2">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${item.active ? 'bg-sage text-white' : 'hover:bg-sage/20'
-                                }`}
-                        >
-                            <item.icon size={20} />
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
-                </nav>
-
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-300 hover:text-red-200 transition-colors"
-                >
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
-            </aside>
+            <AdminSidebar />
 
             {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 ml-64 p-8">
                 <div className="max-w-7xl mx-auto">
+                    {/* Header */}
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-3xl font-bold text-olive">Kelola Villa</h2>
+                        <div>
+                            <h2 className="text-2xl font-display text-gray-900">Kelola Villa</h2>
+                            <p className="text-gray-500 text-sm">Tambah, edit, dan hapus villa</p>
+                        </div>
                         <Link
                             href="/admin/villas/new"
-                            className="flex items-center space-x-2 bg-sage text-white px-4 py-2 rounded-lg hover:bg-sage-dark transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm font-medium hover:bg-olive-900 transition-colors"
                         >
-                            <Plus size={20} />
+                            <Plus size={16} />
                             <span>Tambah Villa</span>
                         </Link>
                     </div>
 
                     {loading ? (
                         <div className="text-center py-20">
-                            <Loader2 size={48} className="animate-spin text-sage mx-auto" />
-                            <p className="mt-4 text-gray-600">Memuat data villa...</p>
+                            <Loader2 size={40} className="animate-spin text-olive-600 mx-auto" />
+                            <p className="mt-4 text-gray-500 text-sm">Memuat data villa...</p>
                         </div>
                     ) : villas.length === 0 ? (
-                        <div className="text-center py-20 bg-white rounded-xl shadow">
+                        <div className="text-center py-20 bg-white border border-gray-100">
                             <Home size={48} className="text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600">Belum ada villa</p>
+                            <p className="text-gray-500 mb-4">Belum ada villa</p>
                             <Link
                                 href="/admin/villas/new"
-                                className="inline-flex items-center space-x-2 bg-sage text-white px-4 py-2 rounded-lg mt-4 hover:bg-sage-dark transition-colors"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm hover:bg-olive-900 transition-colors"
                             >
-                                <Plus size={20} />
+                                <Plus size={16} />
                                 <span>Tambah Villa Pertama</span>
                             </Link>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-xl shadow overflow-hidden">
+                        <div className="bg-white border border-gray-100">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Villa</th>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Harga/Malam</th>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Kamar</th>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Maks Tamu</th>
-                                        <th className="text-right px-6 py-4 font-semibold text-olive">Aksi</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Villa</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Harga/Malam</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Kamar</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Maks Tamu</th>
+                                        <th className="text-right px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y">
+                                <tbody className="divide-y divide-gray-100">
                                     {villas.map((villa) => (
                                         <motion.tr
                                             key={villa.id}
@@ -175,60 +134,62 @@ export default function AdminVillasPage() {
                                             animate={{ opacity: 1 }}
                                             className="hover:bg-gray-50 transition-colors"
                                         >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center space-x-4">
-                                                    <div className="relative w-16 h-12 rounded-lg overflow-hidden">
-                                                        <Image
-                                                            src={villa.images[0]}
-                                                            alt={villa.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="relative w-16 h-12 overflow-hidden bg-gray-100">
+                                                        {villa.images?.[0] && (
+                                                            <Image
+                                                                src={villa.images[0]}
+                                                                alt={villa.name}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        )}
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-olive">{villa.name}</p>
-                                                        <p className="text-sm text-gray-500">{villa.location}</p>
+                                                        <p className="font-medium text-gray-900">{villa.name}</p>
+                                                        <p className="text-xs text-gray-400">{villa.location}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <span className="font-semibold text-sage">
+                                            <td className="px-5 py-4">
+                                                <span className="font-medium text-olive-600">
                                                     {formatCurrency(villa.price_per_night)}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-600">
+                                            <td className="px-5 py-4 text-sm text-gray-600">
                                                 {villa.bedrooms} kamar
                                             </td>
-                                            <td className="px-6 py-4 text-gray-600">
+                                            <td className="px-5 py-4 text-sm text-gray-600">
                                                 {villa.max_guests} orang
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center justify-end space-x-2">
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center justify-end gap-1">
                                                     <Link
                                                         href={`/villas/${villa.id}`}
                                                         target="_blank"
-                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-sage"
+                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-olive-600"
                                                         title="Lihat di Website"
                                                     >
-                                                        <Eye size={20} />
+                                                        <Eye size={18} />
                                                     </Link>
                                                     <Link
                                                         href={`/admin/villas/${villa.id}/edit`}
-                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-blue-600"
+                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-600"
                                                         title="Edit"
                                                     >
-                                                        <Edit size={20} />
+                                                        <Edit size={18} />
                                                     </Link>
                                                     <button
                                                         onClick={() => handleDelete(villa.id)}
                                                         disabled={deleting === villa.id}
-                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-red-600 disabled:opacity-50"
+                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-600 disabled:opacity-50"
                                                         title="Hapus"
                                                     >
                                                         {deleting === villa.id ? (
-                                                            <Loader2 size={20} className="animate-spin" />
+                                                            <Loader2 size={18} className="animate-spin" />
                                                         ) : (
-                                                            <Trash2 size={20} />
+                                                            <Trash2 size={18} />
                                                         )}
                                                     </button>
                                                 </div>

@@ -5,10 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-    Home,
-    Calendar,
-    TrendingUp,
-    LogOut,
     Plus,
     Edit,
     Trash2,
@@ -16,13 +12,13 @@ import {
     EyeOff,
     Loader2,
     FileText,
-    Users
 } from 'lucide-react'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { BlogPost } from '@/types'
 import { format, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
+import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default function AdminBlogPage() {
     const router = useRouter()
@@ -102,93 +98,56 @@ export default function AdminBlogPage() {
         }
     }
 
-    async function handleLogout() {
-        await supabase.auth.signOut()
-        router.push('/admin/login')
-    }
-
-    const menuItems = [
-        { href: '/admin/dashboard', icon: TrendingUp, label: 'Dashboard' },
-        { href: '/admin/villas', icon: Home, label: 'Kelola Villa' },
-        { href: '/admin/bookings', icon: Calendar, label: 'Kelola Booking' },
-        { href: '/admin/blog', icon: FileText, label: 'Kelola Blog', active: true },
-        { href: '/admin/users', icon: Users, label: 'Admin Users' },
-    ]
-
     return (
         <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-olive text-cream p-6 flex flex-col">
-                <div className="mb-8">
-                    <h1 className="font-knewave text-3xl text-sage">StayinUBUD</h1>
-                    <p className="text-sm text-cream/70">Admin Panel</p>
-                </div>
-
-                <nav className="flex-1 space-y-2">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${item.active ? 'bg-sage text-white' : 'hover:bg-sage/20'
-                                }`}
-                        >
-                            <item.icon size={20} />
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
-                </nav>
-
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-300 hover:text-red-200 transition-colors"
-                >
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
-            </aside>
+            <AdminSidebar />
 
             {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 ml-64 p-8">
                 <div className="max-w-7xl mx-auto">
+                    {/* Header */}
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-3xl font-bold text-olive">Kelola Blog</h2>
+                        <div>
+                            <h2 className="text-2xl font-display text-gray-900">Kelola Blog</h2>
+                            <p className="text-gray-500 text-sm">Tulis dan kelola artikel blog</p>
+                        </div>
                         <Link
                             href="/admin/blog/new"
-                            className="flex items-center space-x-2 bg-sage text-white px-4 py-2 rounded-lg hover:bg-sage-dark transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm font-medium hover:bg-olive-900 transition-colors"
                         >
-                            <Plus size={20} />
+                            <Plus size={16} />
                             <span>Tulis Artikel</span>
                         </Link>
                     </div>
 
                     {loading ? (
                         <div className="text-center py-20">
-                            <Loader2 size={48} className="animate-spin text-sage mx-auto" />
-                            <p className="mt-4 text-gray-600">Memuat artikel...</p>
+                            <Loader2 size={40} className="animate-spin text-olive-600 mx-auto" />
+                            <p className="mt-4 text-gray-500 text-sm">Memuat artikel...</p>
                         </div>
                     ) : posts.length === 0 ? (
-                        <div className="text-center py-20 bg-white rounded-xl shadow">
+                        <div className="text-center py-20 bg-white border border-gray-100">
                             <FileText size={48} className="text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600">Belum ada artikel</p>
+                            <p className="text-gray-500 mb-4">Belum ada artikel</p>
                             <Link
                                 href="/admin/blog/new"
-                                className="inline-flex items-center space-x-2 bg-sage text-white px-4 py-2 rounded-lg mt-4 hover:bg-sage-dark transition-colors"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm hover:bg-olive-900 transition-colors"
                             >
-                                <Plus size={20} />
+                                <Plus size={16} />
                                 <span>Tulis Artikel Pertama</span>
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid gap-6">
+                        <div className="space-y-4">
                             {posts.map((post) => (
                                 <motion.div
                                     key={post.id}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white rounded-xl shadow p-6 flex items-start space-x-6"
+                                    className="bg-white border border-gray-100 p-5 flex items-start gap-5"
                                 >
                                     {post.cover_image && (
-                                        <div className="relative w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                                        <div className="relative w-32 h-20 overflow-hidden flex-shrink-0 bg-gray-100">
                                             <Image
                                                 src={post.cover_image}
                                                 alt={post.title}
@@ -197,58 +156,58 @@ export default function AdminBlogPage() {
                                             />
                                         </div>
                                     )}
-                                    <div className="flex-1">
-                                        <div className="flex items-center space-x-2 mb-2">
-                                            <h3 className="font-semibold text-olive text-lg">{post.title}</h3>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${post.published
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-gray-100 text-gray-600'
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="font-medium text-gray-900 truncate">{post.title}</h3>
+                                            <span className={`px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${post.published
+                                                ? 'bg-olive-100 text-olive-900'
+                                                : 'bg-gray-100 text-gray-500'
                                                 }`}>
                                                 {post.published ? 'Published' : 'Draft'}
                                             </span>
                                         </div>
                                         {post.excerpt && (
-                                            <p className="text-gray-600 text-sm line-clamp-2 mb-2">{post.excerpt}</p>
+                                            <p className="text-gray-500 text-sm line-clamp-1 mb-1">{post.excerpt}</p>
                                         )}
                                         <p className="text-xs text-gray-400">
                                             {format(parseISO(post.created_at), 'dd MMMM yyyy', { locale: id })} • {post.author}
                                         </p>
                                     </div>
-                                    <div className="flex items-center space-x-2">
+                                    <div className="flex items-center gap-1 flex-shrink-0">
                                         <button
                                             onClick={() => togglePublish(post.id, post.published)}
                                             disabled={toggling === post.id}
-                                            className={`p-2 rounded-lg transition-colors ${post.published
-                                                    ? 'hover:bg-yellow-50 text-yellow-600'
-                                                    : 'hover:bg-green-50 text-green-600'
+                                            className={`p-2 transition-colors ${post.published
+                                                ? 'hover:bg-amber-50 text-amber-600'
+                                                : 'hover:bg-olive-50 text-olive-600'
                                                 }`}
                                             title={post.published ? 'Sembunyikan' : 'Publikasikan'}
                                         >
                                             {toggling === post.id ? (
-                                                <Loader2 size={20} className="animate-spin" />
+                                                <Loader2 size={18} className="animate-spin" />
                                             ) : post.published ? (
-                                                <EyeOff size={20} />
+                                                <EyeOff size={18} />
                                             ) : (
-                                                <Eye size={20} />
+                                                <Eye size={18} />
                                             )}
                                         </button>
                                         <Link
                                             href={`/admin/blog/${post.id}/edit`}
-                                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-blue-600"
+                                            className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-600"
                                             title="Edit"
                                         >
-                                            <Edit size={20} />
+                                            <Edit size={18} />
                                         </Link>
                                         <button
                                             onClick={() => handleDelete(post.id)}
                                             disabled={deleting === post.id}
-                                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-red-600 disabled:opacity-50"
+                                            className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-600 disabled:opacity-50"
                                             title="Hapus"
                                         >
                                             {deleting === post.id ? (
-                                                <Loader2 size={20} className="animate-spin" />
+                                                <Loader2 size={18} className="animate-spin" />
                                             ) : (
-                                                <Trash2 size={20} />
+                                                <Trash2 size={18} />
                                             )}
                                         </button>
                                     </div>

@@ -2,25 +2,21 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-    Home,
-    Calendar,
-    TrendingUp,
-    LogOut,
     Plus,
     Trash2,
     Loader2,
-    FileText,
     Users,
     Shield,
-    Mail
+    Mail,
+    AlertCircle
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { AdminUser } from '@/types'
 import { format, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
+import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default function AdminUsersPage() {
     const router = useRouter()
@@ -125,95 +121,59 @@ export default function AdminUsersPage() {
         }
     }
 
-    async function handleLogout() {
-        await supabase.auth.signOut()
-        router.push('/admin/login')
-    }
-
-    const menuItems = [
-        { href: '/admin/dashboard', icon: TrendingUp, label: 'Dashboard' },
-        { href: '/admin/villas', icon: Home, label: 'Kelola Villa' },
-        { href: '/admin/bookings', icon: Calendar, label: 'Kelola Booking' },
-        { href: '/admin/blog', icon: FileText, label: 'Kelola Blog' },
-        { href: '/admin/users', icon: Users, label: 'Admin Users', active: true },
-    ]
-
     return (
         <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-olive text-cream p-6 flex flex-col">
-                <div className="mb-8">
-                    <h1 className="font-knewave text-3xl text-sage">StayinUBUD</h1>
-                    <p className="text-sm text-cream/70">Admin Panel</p>
-                </div>
-
-                <nav className="flex-1 space-y-2">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${item.active ? 'bg-sage text-white' : 'hover:bg-sage/20'
-                                }`}
-                        >
-                            <item.icon size={20} />
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
-                </nav>
-
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-300 hover:text-red-200 transition-colors"
-                >
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
-            </aside>
+            <AdminSidebar />
 
             {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 ml-64 p-8">
                 <div className="max-w-4xl mx-auto">
+                    {/* Header */}
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-3xl font-bold text-olive">Admin Users</h2>
+                        <div>
+                            <h2 className="text-2xl font-display text-gray-900">Admin Users</h2>
+                            <p className="text-gray-500 text-sm">Kelola akses admin panel</p>
+                        </div>
                         <button
                             onClick={() => setShowAddModal(true)}
-                            className="flex items-center space-x-2 bg-sage text-white px-4 py-2 rounded-lg hover:bg-sage-dark transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm font-medium hover:bg-olive-900 transition-colors"
                         >
-                            <Plus size={20} />
+                            <Plus size={16} />
                             <span>Tambah Admin</span>
                         </button>
                     </div>
 
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                        <p className="text-sm text-yellow-800">
-                            <strong>Catatan:</strong> Untuk login sebagai admin, user harus:
-                            <br />1. Terdaftar di Supabase Authentication
-                            <br />2. Email terdaftar di tabel admin_users ini
+                    {/* Info Box */}
+                    <div className="bg-amber-50 border border-amber-200 p-4 mb-6 flex items-start gap-3">
+                        <AlertCircle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-amber-800">
+                            <strong>Catatan:</strong> Untuk login sebagai admin, user harus terdaftar di Supabase Authentication
+                            dan email-nya tercatat di tabel admin_users ini.
                         </p>
                     </div>
 
                     {loading ? (
                         <div className="text-center py-20">
-                            <Loader2 size={48} className="animate-spin text-sage mx-auto" />
-                            <p className="mt-4 text-gray-600">Memuat data admin...</p>
+                            <Loader2 size={40} className="animate-spin text-olive-600 mx-auto" />
+                            <p className="mt-4 text-gray-500 text-sm">Memuat data admin...</p>
                         </div>
                     ) : users.length === 0 ? (
-                        <div className="text-center py-20 bg-white rounded-xl shadow">
+                        <div className="text-center py-20 bg-white border border-gray-100">
                             <Users size={48} className="text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600">Belum ada admin</p>
+                            <p className="text-gray-500">Belum ada admin</p>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-xl shadow overflow-hidden">
+                        <div className="bg-white border border-gray-100">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-gray-50 border-b border-gray-100">
                                     <tr>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Email</th>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Role</th>
-                                        <th className="text-left px-6 py-4 font-semibold text-olive">Tanggal Ditambahkan</th>
-                                        <th className="text-right px-6 py-4 font-semibold text-olive">Aksi</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Ditambahkan</th>
+                                        <th className="text-right px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y">
+                                <tbody className="divide-y divide-gray-100">
                                     {users.map((user) => (
                                         <motion.tr
                                             key={user.id}
@@ -221,43 +181,43 @@ export default function AdminUsersPage() {
                                             animate={{ opacity: 1 }}
                                             className="hover:bg-gray-50 transition-colors"
                                         >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-10 h-10 bg-sage/20 rounded-full flex items-center justify-center">
-                                                        <Mail size={18} className="text-sage" />
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 bg-olive-100 flex items-center justify-center">
+                                                        <Mail size={16} className="text-olive-600" />
                                                     </div>
                                                     <div>
-                                                        <p className="font-medium text-olive">{user.email}</p>
+                                                        <p className="font-medium text-gray-900">{user.email}</p>
                                                         {user.email === currentUserEmail && (
-                                                            <span className="text-xs text-sage">(Anda)</span>
+                                                            <span className="text-xs text-olive-600">(Anda)</span>
                                                         )}
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium ${user.role === 'super_admin'
-                                                        ? 'bg-purple-100 text-purple-700'
-                                                        : 'bg-blue-100 text-blue-700'
+                                            <td className="px-5 py-4">
+                                                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium ${user.role === 'super_admin'
+                                                    ? 'bg-purple-100 text-purple-700'
+                                                    : 'bg-olive-100 text-olive-700'
                                                     }`}>
-                                                    <Shield size={14} />
+                                                    <Shield size={12} />
                                                     <span>{user.role === 'super_admin' ? 'Super Admin' : 'Admin'}</span>
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-600">
+                                            <td className="px-5 py-4 text-sm text-gray-500">
                                                 {format(parseISO(user.created_at), 'dd MMM yyyy', { locale: id })}
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-5 py-4">
                                                 <div className="flex items-center justify-end">
                                                     <button
                                                         onClick={() => handleDelete(user.id, user.email)}
                                                         disabled={deleting === user.id || user.email === currentUserEmail}
-                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed"
                                                         title={user.email === currentUserEmail ? 'Tidak bisa hapus akun sendiri' : 'Hapus'}
                                                     >
                                                         {deleting === user.id ? (
-                                                            <Loader2 size={20} className="animate-spin" />
+                                                            <Loader2 size={18} className="animate-spin" />
                                                         ) : (
-                                                            <Trash2 size={20} />
+                                                            <Trash2 size={18} />
                                                         )}
                                                     </button>
                                                 </div>
@@ -275,15 +235,15 @@ export default function AdminUsersPage() {
             {showAddModal && (
                 <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
+                        initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md"
+                        className="bg-white p-8 w-full max-w-md"
                     >
-                        <h3 className="text-2xl font-bold text-olive mb-6">Tambah Admin Baru</h3>
+                        <h3 className="text-xl font-display text-gray-900 mb-6">Tambah Admin Baru</h3>
 
-                        <form onSubmit={handleAddUser} className="space-y-4">
+                        <form onSubmit={handleAddUser} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Email *
                                 </label>
                                 <input
@@ -292,41 +252,41 @@ export default function AdminUsersPage() {
                                     onChange={(e) => setNewEmail(e.target.value)}
                                     placeholder="admin@example.com"
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Role
                                 </label>
                                 <select
                                     value={newRole}
                                     onChange={(e) => setNewRole(e.target.value as 'admin' | 'super_admin')}
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 >
                                     <option value="admin">Admin</option>
                                     <option value="super_admin">Super Admin</option>
                                 </select>
                             </div>
 
-                            <div className="flex justify-end space-x-3 pt-4">
+                            <div className="flex justify-end gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setShowAddModal(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                    className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
                                 >
                                     Batal
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={adding}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-sage text-white rounded-lg hover:bg-sage-dark disabled:opacity-50"
+                                    className="flex items-center gap-2 px-4 py-2 bg-olive-600 text-white hover:bg-olive-900 disabled:opacity-50 transition-colors"
                                 >
                                     {adding ? (
-                                        <Loader2 size={18} className="animate-spin" />
+                                        <Loader2 size={16} className="animate-spin" />
                                     ) : (
-                                        <Plus size={18} />
+                                        <Plus size={16} />
                                     )}
                                     <span>Tambah</span>
                                 </button>
