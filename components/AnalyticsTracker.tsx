@@ -110,24 +110,9 @@ export default function AnalyticsTracker() {
         startTime.current = Date.now()
         currentPath.current = pathname
 
-        // Track duration when leaving page
-        const handleBeforeUnload = () => {
-            const duration = Math.floor((Date.now() - startTime.current) / 1000)
-
-            // Use sendBeacon for reliable tracking on page unload
-            if (navigator.sendBeacon) {
-                const data = new FormData()
-                data.append('path', currentPath.current)
-                data.append('duration', duration.toString())
-                // Note: You'd need an API endpoint to handle this
-                // navigator.sendBeacon('/api/analytics/duration', data)
-            }
-        }
-
-        window.addEventListener('beforeunload', handleBeforeUnload)
-
+        // Cleanup function
         return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload)
+            // Duration tracking could be added here with an API endpoint in the future
         }
     }, [pathname])
 
