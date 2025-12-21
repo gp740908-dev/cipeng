@@ -52,9 +52,9 @@ export default function Navbar() {
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12">
                     <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="relative z-10 h-16 md:h-20 flex items-center">
+                        <Link href="/" className="relative z-10 h-20 md:h-24 flex items-center">
                             {/* Container with fixed height for smooth transition */}
-                            <div className="relative w-40 md:w-48 h-full flex items-center">
+                            <div className="relative w-48 md:w-56 h-full flex items-center">
                                 {/* Image Logo - Always rendered, opacity controlled */}
                                 <motion.div
                                     animate={{
@@ -71,9 +71,9 @@ export default function Navbar() {
                                     <Image
                                         src="/images/logo.png"
                                         alt="StayinUBUD"
-                                        width={180}
-                                        height={100}
-                                        className="h-14 md:h-16 w-auto object-contain"
+                                        width={220}
+                                        height={120}
+                                        className="h-20 md:h-24 w-auto object-contain"
                                         priority
                                     />
                                 </motion.div>
