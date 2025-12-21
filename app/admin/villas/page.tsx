@@ -116,89 +116,160 @@ export default function AdminVillasPage() {
                             </Link>
                         </div>
                     ) : (
-                        <div className="bg-white border border-gray-100">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 border-b border-gray-100">
-                                    <tr>
-                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Villa</th>
-                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Harga/Malam</th>
-                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Kamar</th>
-                                        <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Maks Tamu</th>
-                                        <th className="text-right px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {villas.map((villa) => (
-                                        <motion.tr
-                                            key={villa.id}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="hover:bg-gray-50 transition-colors"
-                                        >
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="relative w-16 h-12 overflow-hidden bg-gray-100">
-                                                        {villa.images?.[0] && (
-                                                            <Image
-                                                                src={villa.images[0]}
-                                                                alt={villa.name}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        )}
+                        <div className="space-y-4">
+                            {/* Desktop Table */}
+                            <div className="hidden md:block bg-white border border-gray-100 overflow-hidden">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50 border-b border-gray-100">
+                                        <tr>
+                                            <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Villa</th>
+                                            <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Harga/Malam</th>
+                                            <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Kamar</th>
+                                            <th className="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Maks Tamu</th>
+                                            <th className="text-right px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {villas.map((villa) => (
+                                            <motion.tr
+                                                key={villa.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                className="hover:bg-gray-50 transition-colors"
+                                            >
+                                                <td className="px-5 py-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="relative w-16 h-12 overflow-hidden bg-gray-100 flex-shrink-0">
+                                                            {villa.images?.[0] && (
+                                                                <Image
+                                                                    src={villa.images[0]}
+                                                                    alt={villa.name}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium text-gray-900 line-clamp-1">{villa.name}</p>
+                                                            <p className="text-xs text-gray-400 line-clamp-1">{villa.location}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">{villa.name}</p>
-                                                        <p className="text-xs text-gray-400">{villa.location}</p>
+                                                </td>
+                                                <td className="px-5 py-4 whitespace-nowrap">
+                                                    <span className="font-medium text-olive-600">
+                                                        {formatCurrency(villa.price_per_night)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-5 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                                    {villa.bedrooms} kamar
+                                                </td>
+                                                <td className="px-5 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                                    {villa.max_guests} orang
+                                                </td>
+                                                <td className="px-5 py-4">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Link
+                                                            href={`/villas/${villa.id}`}
+                                                            target="_blank"
+                                                            className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-olive-600"
+                                                            title="Lihat di Website"
+                                                        >
+                                                            <Eye size={18} />
+                                                        </Link>
+                                                        <Link
+                                                            href={`/admin/villas/${villa.id}/edit`}
+                                                            className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-600"
+                                                            title="Edit"
+                                                        >
+                                                            <Edit size={18} />
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => handleDelete(villa.id)}
+                                                            disabled={deleting === villa.id}
+                                                            className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-600 disabled:opacity-50"
+                                                            title="Hapus"
+                                                        >
+                                                            {deleting === villa.id ? (
+                                                                <Loader2 size={18} className="animate-spin" />
+                                                            ) : (
+                                                                <Trash2 size={18} />
+                                                            )}
+                                                        </button>
                                                     </div>
+                                                </td>
+                                            </motion.tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile Card View */}
+                            <div className="md:hidden space-y-4">
+                                {villas.map((villa) => (
+                                    <motion.div
+                                        key={villa.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="bg-white border border-gray-100 p-4"
+                                    >
+                                        <div className="flex gap-4 mb-4">
+                                            <div className="relative w-20 h-20 bg-gray-100 flex-shrink-0">
+                                                {villa.images?.[0] && (
+                                                    <Image
+                                                        src={villa.images[0]}
+                                                        alt={villa.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-medium text-gray-900 line-clamp-1">{villa.name}</h3>
+                                                <div className="flex items-center text-xs text-gray-500 mb-1">
+                                                    <span className="line-clamp-1">{villa.location}</span>
                                                 </div>
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <span className="font-medium text-olive-600">
+                                                <p className="font-medium text-olive-600 text-sm">
                                                     {formatCurrency(villa.price_per_night)}
-                                                </span>
-                                            </td>
-                                            <td className="px-5 py-4 text-sm text-gray-600">
-                                                {villa.bedrooms} kamar
-                                            </td>
-                                            <td className="px-5 py-4 text-sm text-gray-600">
-                                                {villa.max_guests} orang
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Link
-                                                        href={`/villas/${villa.id}`}
-                                                        target="_blank"
-                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-olive-600"
-                                                        title="Lihat di Website"
-                                                    >
-                                                        <Eye size={18} />
-                                                    </Link>
-                                                    <Link
-                                                        href={`/admin/villas/${villa.id}/edit`}
-                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-blue-600"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => handleDelete(villa.id)}
-                                                        disabled={deleting === villa.id}
-                                                        className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-red-600 disabled:opacity-50"
-                                                        title="Hapus"
-                                                    >
-                                                        {deleting === villa.id ? (
-                                                            <Loader2 size={18} className="animate-spin" />
-                                                        ) : (
-                                                            <Trash2 size={18} />
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </motion.tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                                    <span className="text-gray-400 font-normal text-xs"> /malam</span>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                                            <div className="flex gap-4 text-xs text-gray-500">
+                                                <span>{villa.bedrooms} Kamar Tidur</span>
+                                                <span>{villa.max_guests} Tamu</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Link
+                                                    href={`/villas/${villa.id}`}
+                                                    target="_blank"
+                                                    className="p-2 text-gray-400 hover:text-olive-600"
+                                                >
+                                                    <Eye size={18} />
+                                                </Link>
+                                                <Link
+                                                    href={`/admin/villas/${villa.id}/edit`}
+                                                    className="p-2 text-gray-400 hover:text-blue-600"
+                                                >
+                                                    <Edit size={18} />
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(villa.id)}
+                                                    disabled={deleting === villa.id}
+                                                    className="p-2 text-gray-400 hover:text-red-600 disabled:opacity-50"
+                                                >
+                                                    {deleting === villa.id ? (
+                                                        <Loader2 size={18} className="animate-spin" />
+                                                    ) : (
+                                                        <Trash2 size={18} />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>
