@@ -4,18 +4,15 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
-    Home,
-    Calendar,
-    TrendingUp,
-    LogOut,
     ArrowLeft,
     Save,
     X,
     Plus,
-    Loader2
+    Loader2,
+    MapPin
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { Villa } from '@/types'
+import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default function EditVillaPage() {
     const router = useRouter()
@@ -33,6 +30,8 @@ export default function EditVillaPage() {
         max_guests: 4,
         price_per_night: 2500000,
         location: 'Ubud, Bali',
+        latitude: -8.5069,
+        longitude: 115.2624,
         amenities: [''],
         images: [''],
     })
@@ -60,6 +59,8 @@ export default function EditVillaPage() {
                     max_guests: data.max_guests,
                     price_per_night: data.price_per_night,
                     location: data.location,
+                    latitude: data.latitude || -8.5069,
+                    longitude: data.longitude || 115.2624,
                     amenities: data.amenities || [''],
                     images: data.images || [''],
                 })
@@ -94,6 +95,8 @@ export default function EditVillaPage() {
                     max_guests: formData.max_guests,
                     price_per_night: formData.price_per_night,
                     location: formData.location,
+                    latitude: formData.latitude || null,
+                    longitude: formData.longitude || null,
                     amenities: formData.amenities.filter(a => a.trim()),
                     images: formData.images.filter(img => img.trim()),
                 })
@@ -144,18 +147,12 @@ export default function EditVillaPage() {
         setFormData({ ...formData, amenities: newAmenities })
     }
 
-    const menuItems = [
-        { href: '/admin/dashboard', icon: TrendingUp, label: 'Dashboard' },
-        { href: '/admin/villas', icon: Home, label: 'Kelola Villa', active: true },
-        { href: '/admin/bookings', icon: Calendar, label: 'Kelola Booking' },
-    ]
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <Loader2 size={48} className="animate-spin text-sage mx-auto" />
-                    <p className="mt-4 text-gray-600">Memuat data villa...</p>
+                    <Loader2 size={40} className="animate-spin text-olive-600 mx-auto" />
+                    <p className="mt-4 text-gray-500 text-sm">Memuat data villa...</p>
                 </div>
             </div>
         )
@@ -163,57 +160,28 @@ export default function EditVillaPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-olive text-cream p-6 flex flex-col">
-                <div className="mb-8">
-                    <h1 className="font-knewave text-3xl text-sage">StayinUBUD</h1>
-                    <p className="text-sm text-cream/70">Admin Panel</p>
-                </div>
+            <AdminSidebar />
 
-                <nav className="flex-1 space-y-2">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${item.active ? 'bg-sage text-white' : 'hover:bg-sage/20'
-                                }`}
-                        >
-                            <item.icon size={20} />
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
-                </nav>
-
-                <button
-                    onClick={async () => {
-                        await supabase.auth.signOut()
-                        router.push('/admin/login')
-                    }}
-                    className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-red-500/20 text-red-300 hover:text-red-200 transition-colors"
-                >
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 ml-64 p-8">
                 <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center space-x-4 mb-8">
+                    <div className="flex items-center gap-4 mb-8">
                         <Link
                             href="/admin/villas"
-                            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-200 transition-colors"
                         >
-                            <ArrowLeft size={24} className="text-olive" />
+                            <ArrowLeft size={24} className="text-gray-600" />
                         </Link>
-                        <h2 className="text-3xl font-bold text-olive">Edit Villa</h2>
+                        <div>
+                            <h2 className="text-2xl font-display text-gray-900">Edit Villa</h2>
+                            <p className="text-gray-500 text-sm">Ubah informasi villa</p>
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8">
+                    <form onSubmit={handleSubmit} className="bg-white border border-gray-100 p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Name */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Nama Villa *
                                 </label>
                                 <input
@@ -221,13 +189,13 @@ export default function EditVillaPage() {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
                             </div>
 
                             {/* Description */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Deskripsi *
                                 </label>
                                 <textarea
@@ -235,26 +203,65 @@ export default function EditVillaPage() {
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     rows={5}
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20 resize-none"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors resize-none"
                                 />
                             </div>
 
                             {/* Location */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Lokasi
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.location}
                                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
+                            </div>
+
+                            {/* Map Coordinates */}
+                            <div className="md:col-span-2 p-4 bg-gray-50 border border-gray-200">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <MapPin size={16} className="text-olive-600" />
+                                    <span className="text-sm font-medium text-gray-700">Koordinat Peta</span>
+                                </div>
+                                <p className="text-xs text-gray-500 mb-4">
+                                    Dapatkan koordinat dari Google Maps. Klik kanan pada lokasi villa → Pilih koordinat yang muncul.
+                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                                            Latitude
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.000001"
+                                            value={formData.latitude}
+                                            onChange={(e) => setFormData({ ...formData, latitude: parseFloat(e.target.value) })}
+                                            placeholder="-8.5069"
+                                            className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                                            Longitude
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.000001"
+                                            value={formData.longitude}
+                                            onChange={(e) => setFormData({ ...formData, longitude: parseFloat(e.target.value) })}
+                                            placeholder="115.2624"
+                                            className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Price */}
                             <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Harga per Malam (IDR) *
                                 </label>
                                 <input
@@ -264,13 +271,13 @@ export default function EditVillaPage() {
                                     min="100000"
                                     step="100000"
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
                             </div>
 
                             {/* Bedrooms */}
                             <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Jumlah Kamar Tidur
                                 </label>
                                 <input
@@ -279,13 +286,13 @@ export default function EditVillaPage() {
                                     onChange={(e) => setFormData({ ...formData, bedrooms: parseInt(e.target.value) })}
                                     min="1"
                                     max="10"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
                             </div>
 
                             {/* Bathrooms */}
                             <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Jumlah Kamar Mandi
                                 </label>
                                 <input
@@ -294,13 +301,13 @@ export default function EditVillaPage() {
                                     onChange={(e) => setFormData({ ...formData, bathrooms: parseInt(e.target.value) })}
                                     min="1"
                                     max="10"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
                             </div>
 
                             {/* Max Guests */}
                             <div>
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Maksimal Tamu
                                 </label>
                                 <input
@@ -309,32 +316,32 @@ export default function EditVillaPage() {
                                     onChange={(e) => setFormData({ ...formData, max_guests: parseInt(e.target.value) })}
                                     min="1"
                                     max="20"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                    className="w-full px-4 py-3 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                 />
                             </div>
 
                             {/* Images */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     URL Gambar
                                 </label>
                                 <div className="space-y-2">
                                     {formData.images.map((image, index) => (
-                                        <div key={index} className="flex space-x-2">
+                                        <div key={index} className="flex gap-2">
                                             <input
                                                 type="url"
                                                 value={image}
                                                 onChange={(e) => updateImage(index, e.target.value)}
                                                 placeholder="https://images.unsplash.com/..."
-                                                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                                className="flex-1 px-4 py-2 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                             />
                                             {formData.images.length > 1 && (
                                                 <button
                                                     type="button"
                                                     onClick={() => removeImageField(index)}
-                                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                                    className="p-2 text-red-500 hover:bg-red-50"
                                                 >
-                                                    <X size={20} />
+                                                    <X size={18} />
                                                 </button>
                                             )}
                                         </div>
@@ -342,9 +349,9 @@ export default function EditVillaPage() {
                                     <button
                                         type="button"
                                         onClick={addImageField}
-                                        className="flex items-center space-x-2 text-sage hover:text-sage-dark"
+                                        className="flex items-center gap-2 text-olive-600 hover:text-olive-900 text-sm"
                                     >
-                                        <Plus size={18} />
+                                        <Plus size={16} />
                                         <span>Tambah Gambar</span>
                                     </button>
                                 </div>
@@ -352,34 +359,34 @@ export default function EditVillaPage() {
 
                             {/* Amenities */}
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-olive mb-2">
+                                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
                                     Fasilitas
                                 </label>
                                 <div className="space-y-2">
                                     {formData.amenities.map((amenity, index) => (
-                                        <div key={index} className="flex space-x-2">
+                                        <div key={index} className="flex gap-2">
                                             <input
                                                 type="text"
                                                 value={amenity}
                                                 onChange={(e) => updateAmenity(index, e.target.value)}
                                                 placeholder="Private Pool"
-                                                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-sage focus:ring-2 focus:ring-sage/20"
+                                                className="flex-1 px-4 py-2 border border-gray-200 focus:border-olive-600 outline-none transition-colors"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => removeAmenity(index)}
-                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                                className="p-2 text-red-500 hover:bg-red-50"
                                             >
-                                                <X size={20} />
+                                                <X size={18} />
                                             </button>
                                         </div>
                                     ))}
                                     <button
                                         type="button"
                                         onClick={addAmenity}
-                                        className="flex items-center space-x-2 text-sage hover:text-sage-dark"
+                                        className="flex items-center gap-2 text-olive-600 hover:text-olive-900 text-sm"
                                     >
-                                        <Plus size={18} />
+                                        <Plus size={16} />
                                         <span>Tambah Fasilitas</span>
                                     </button>
                                 </div>
@@ -387,26 +394,26 @@ export default function EditVillaPage() {
                         </div>
 
                         {/* Submit */}
-                        <div className="mt-8 flex justify-end space-x-4">
+                        <div className="mt-8 flex justify-end gap-4">
                             <Link
                                 href="/admin/villas"
-                                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="px-6 py-3 border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
                             >
                                 Batal
                             </Link>
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="flex items-center space-x-2 px-6 py-3 bg-sage text-white rounded-lg hover:bg-sage-dark transition-colors disabled:opacity-50"
+                                className="flex items-center gap-2 px-6 py-3 bg-olive-600 text-white hover:bg-olive-900 transition-colors disabled:opacity-50"
                             >
                                 {saving ? (
                                     <>
-                                        <Loader2 size={20} className="animate-spin" />
+                                        <Loader2 size={18} className="animate-spin" />
                                         <span>Menyimpan...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Save size={20} />
+                                        <Save size={18} />
                                         <span>Simpan Perubahan</span>
                                     </>
                                 )}

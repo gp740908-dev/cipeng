@@ -9,6 +9,8 @@ export interface Villa {
     amenities: string[]
     images: string[]
     location: string
+    latitude: number | null
+    longitude: number | null
     created_at: string
     updated_at: string
 }

@@ -3,11 +3,25 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react'
+import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, ArrowLeft, Navigation } from 'lucide-react'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import ModernBookingFlow from '@/components/ModernBookingFlow'
+
+// Dynamic import for map (no SSR)
+const VillaMap = dynamic(() => import('@/components/VillaMap'), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center">
+            <div className="text-center">
+                <div className="w-8 h-8 border-2 border-olive-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                <p className="text-sm text-gray-500">Loading map...</p>
+            </div>
+        </div>
+    )
+})
 
 interface VillaDetailsProps {
     villa: Villa
@@ -176,6 +190,40 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                 ))}
                             </div>
                         </motion.div>
+
+                        {/* Location Map */}
+                        {villa.latitude && villa.longitude && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                            >
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="font-display text-2xl text-primary">Location</h2>
+                                    <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${villa.latitude},${villa.longitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 text-sm text-olive-600 hover:text-olive-900 transition-colors"
+                                    >
+                                        <Navigation size={14} />
+                                        <span>Get Directions</span>
+                                    </a>
+                                </div>
+                                <div className="mb-4">
+                                    <div className="flex items-center text-muted text-sm">
+                                        <MapPin size={14} className="mr-2" />
+                                        <span>{villa.location}</span>
+                                    </div>
+                                </div>
+                                <VillaMap
+                                    latitude={villa.latitude}
+                                    longitude={villa.longitude}
+                                    villaName={villa.name}
+                                    location={villa.location}
+                                />
+                            </motion.div>
+                        )}
                     </div>
 
                     {/* Right: Booking Card */}
