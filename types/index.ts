@@ -161,3 +161,89 @@ export interface Media {
     uploaded_by: string | null
     created_at: string
 }
+
+export interface Promo {
+    id: string
+    code: string
+    name: string
+    description: string | null
+    discount_type: 'percentage' | 'fixed'
+    discount_value: number
+    min_stay_nights: number
+    min_booking_amount: number
+    max_discount_amount: number | null
+    usage_limit: number | null
+    used_count: number
+    valid_from: string
+    valid_until: string | null
+    applicable_villas: string[] | null
+    is_active: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface PromotionalBanner {
+    id: string
+    title: string
+    subtitle: string | null
+    description: string | null
+    image_url: string | null
+    cta_text: string | null
+    cta_link: string | null
+    position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center' | 'full-width'
+    display_type: 'popup' | 'banner' | 'slide-in'
+    background_color: string
+    text_color: string
+    show_on_pages: string[]
+    delay_seconds: number
+    show_frequency: 'always' | 'once_per_session' | 'once_per_day' | 'once_ever'
+    priority: number
+    valid_from: string
+    valid_until: string | null
+    is_active: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface ActivityLog {
+    id: string
+    user_id: string | null
+    user_email: string | null
+    action: string
+    entity_type: string | null
+    entity_id: string | null
+    entity_name: string | null
+    details: Record<string, any> | null
+    ip_address: string | null
+    user_agent: string | null
+    created_at: string
+}
+
+export interface EmailTemplate {
+    id: string
+    name: string
+    subject: string
+    html_content: string
+    text_content: string | null
+    variables: string[]
+    category: 'booking' | 'notification' | 'marketing' | 'general'
+    is_active: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface EmailLog {
+    id: string
+    template_id: string | null
+    template_name: string | null
+    recipient_email: string
+    recipient_name: string | null
+    subject: string | null
+    status: 'pending' | 'sent' | 'delivered' | 'failed' | 'bounced'
+    resend_id: string | null
+    error_message: string | null
+    metadata: Record<string, any> | null
+    sent_at: string | null
+    created_at: string
+}
+

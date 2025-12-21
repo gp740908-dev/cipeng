@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import BackToTop from '@/components/BackToTop'
+import PromoBanner from '@/components/PromoBanner'
 
 export const metadata: Metadata = {
   title: 'StayinUBUD - Luxury Villa Rentals in Ubud, Bali',
@@ -26,6 +27,8 @@ export default function HomePage() {
       <Footer />
       <WhatsAppButton />
       <BackToTop />
+      <PromoBanner page="home" />
     </main>
   )
 }
+

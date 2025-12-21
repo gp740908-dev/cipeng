@@ -17,7 +17,12 @@ import {
     Sparkles,
     LayoutDashboard,
     Globe,
-    BarChart3
+    BarChart3,
+    Tag,
+    Megaphone,
+    Download,
+    Mail,
+    Activity,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -27,6 +32,7 @@ const menuGroups = [
         items: [
             { href: '/admin/dashboard', icon: TrendingUp, label: 'Dashboard' },
             { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
+            { href: '/admin/reports', icon: Download, label: 'Reports' },
         ]
     },
     {
@@ -37,6 +43,14 @@ const menuGroups = [
             { href: '/admin/experiences', icon: Sparkles, label: 'Experiences' },
             { href: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials' },
             { href: '/admin/blog', icon: FileText, label: 'Blog' },
+        ]
+    },
+    {
+        label: 'Marketing',
+        items: [
+            { href: '/admin/promos', icon: Tag, label: 'Promo Codes' },
+            { href: '/admin/banners', icon: Megaphone, label: 'Promo Banners' },
+            { href: '/admin/email-templates', icon: Mail, label: 'Email Templates' },
         ]
     },
     {
@@ -51,6 +65,7 @@ const menuGroups = [
             { href: '/admin/settings', icon: Settings, label: 'Site Settings' },
             { href: '/admin/media', icon: Image, label: 'Media Library' },
             { href: '/admin/users', icon: Users, label: 'Admin Users' },
+            { href: '/admin/activity-log', icon: Activity, label: 'Activity Log' },
         ]
     },
 ]
