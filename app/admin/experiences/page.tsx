@@ -16,7 +16,7 @@ import {
     EyeOff
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { Experience } from '@/types'
 import { useToast } from '@/components/ui/Toast'
 
@@ -183,17 +183,17 @@ export default function ExperiencesPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-olive-600" />
-            </div>
+            <AdminLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <Loader2 size={40} className="animate-spin text-olive-600" />
+                </div>
+            </AdminLayout>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-8">
@@ -419,6 +419,6 @@ export default function ExperiencesPage() {
                     </div>
                 </div>
             )}
-        </div>
+        </AdminLayout>
     )
 }

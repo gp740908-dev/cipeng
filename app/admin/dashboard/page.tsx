@@ -18,7 +18,7 @@ import { Booking } from '@/types'
 import Link from 'next/link'
 import { parseISO, format } from 'date-fns'
 import { id } from 'date-fns/locale'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 
 export default function AdminDashboard() {
     const router = useRouter()
@@ -132,16 +132,14 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
+        <AdminLayout>
             {/* Main Content */}
-            <main className="flex-1 ml-64 p-8">
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
                         <div>
-                            <h2 className="text-2xl font-display text-gray-900">Dashboard</h2>
+                            <h2 className="text-xl sm:text-2xl font-display text-gray-900">Dashboard</h2>
                             <p className="text-gray-500 text-sm">Overview statistik dan booking terbaru</p>
                         </div>
                         <Link
@@ -306,6 +304,6 @@ export default function AdminDashboard() {
                     )}
                 </div>
             </main>
-        </div>
+        </AdminLayout>
     )
 }

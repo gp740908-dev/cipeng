@@ -27,7 +27,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ActivityLog } from '@/types'
 import { format, parseISO, formatDistanceToNow } from 'date-fns'
 import { id } from 'date-fns/locale'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 
 const actionIcons: Record<string, any> = {
     create: Plus,
@@ -145,17 +145,13 @@ export default function AdminActivityLogPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h1 className="text-2xl font-display text-gray-900">Activity Log</h1>
-                            <p className="text-gray-500 text-sm">Pantau semua aktivitas di admin panel</p>
-                        </div>
+                    <div className="mb-6 sm:mb-8">
+                        <h1 className="text-xl sm:text-2xl font-display text-gray-900">Activity Log</h1>
+                        <p className="text-gray-500 text-sm">Pantau semua aktivitas di admin panel</p>
                     </div>
 
                     {/* Filters */}
@@ -310,6 +306,6 @@ export default function AdminActivityLogPage() {
                     )}
                 </div>
             </main>
-        </div>
+        </AdminLayout>
     )
 }

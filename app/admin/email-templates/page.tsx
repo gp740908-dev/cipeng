@@ -23,7 +23,7 @@ import { createClient } from '@/lib/supabase/client'
 import { EmailTemplate, EmailLog } from '@/types'
 import { format, parseISO, formatDistanceToNow } from 'date-fns'
 import { id } from 'date-fns/locale'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useToast } from '@/components/ui/Toast'
 
 const categoryColors: Record<string, string> = {
@@ -241,28 +241,28 @@ export default function AdminEmailTemplatesPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-olive-600" />
-            </div>
+            <AdminLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <Loader2 size={40} className="animate-spin text-olive-600" />
+                </div>
+            </AdminLayout>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
                         <div>
-                            <h1 className="text-2xl font-display text-gray-900">Email Templates</h1>
+                            <h1 className="text-xl sm:text-2xl font-display text-gray-900">Email Templates</h1>
                             <p className="text-gray-500 text-sm">Kelola template email dengan Resend</p>
                         </div>
                         {activeTab === 'templates' && (
                             <button
                                 onClick={openAddModal}
-                                className="flex items-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm font-medium hover:bg-olive-700 transition-colors"
+                                className="flex items-center justify-center gap-2 px-4 py-2 bg-olive-600 text-white text-sm font-medium hover:bg-olive-700 transition-colors"
                             >
                                 <Plus size={16} />
                                 <span>Tambah Template</span>
@@ -275,8 +275,8 @@ export default function AdminEmailTemplatesPage() {
                         <button
                             onClick={() => setActiveTab('templates')}
                             className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'templates'
-                                    ? 'bg-olive-600 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-olive-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             <FileText size={14} className="inline mr-2" />
@@ -285,8 +285,8 @@ export default function AdminEmailTemplatesPage() {
                         <button
                             onClick={() => setActiveTab('logs')}
                             className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'logs'
-                                    ? 'bg-olive-600 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-olive-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             <Send size={14} className="inline mr-2" />
@@ -396,10 +396,10 @@ export default function AdminEmailTemplatesPage() {
                                                 </div>
                                                 <div className="text-right">
                                                     <span className={`text-xs px-2 py-0.5 ${log.status === 'sent' || log.status === 'delivered'
-                                                            ? 'bg-green-100 text-green-700'
-                                                            : log.status === 'failed' || log.status === 'bounced'
-                                                                ? 'bg-red-100 text-red-700'
-                                                                : 'bg-amber-100 text-amber-700'
+                                                        ? 'bg-green-100 text-green-700'
+                                                        : log.status === 'failed' || log.status === 'bounced'
+                                                            ? 'bg-red-100 text-red-700'
+                                                            : 'bg-amber-100 text-amber-700'
                                                         }`}>
                                                         {log.status}
                                                     </span>
@@ -608,6 +608,6 @@ export default function AdminEmailTemplatesPage() {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </AdminLayout>
     )
 }

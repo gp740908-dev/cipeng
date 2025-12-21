@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { NearbyPlace } from '@/types'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useToast } from '@/components/ui/Toast'
 
 const placeTypes = [
@@ -151,10 +151,8 @@ export default function AddVillaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center gap-4 mb-8">
                         <Link
@@ -472,6 +470,6 @@ export default function AddVillaPage() {
                     </form>
                 </div>
             </main>
-        </div>
+        </AdminLayout>
     )
 }

@@ -18,7 +18,7 @@ import {
     ArrowDown
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { Villa, HeroSlide } from '@/types'
 import { useToast } from '@/components/ui/Toast'
 
@@ -197,9 +197,11 @@ export default function HomepagePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-olive-600" />
-            </div>
+            <AdminLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <Loader2 size={40} className="animate-spin text-olive-600" />
+                </div>
+            </AdminLayout>
         )
     }
 
@@ -207,14 +209,12 @@ export default function HomepagePage() {
     const availableVillas = villas.filter(v => !heroSlides.some(s => s.villa_id === v.id))
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-5xl mx-auto">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-2xl font-display text-gray-900">Homepage Settings</h1>
+                        <h1 className="text-xl sm:text-2xl font-display text-gray-900">Homepage Settings</h1>
                         <p className="text-gray-500 text-sm">Kelola hero slides dan featured villas</p>
                     </div>
 
@@ -433,6 +433,6 @@ export default function HomepagePage() {
                     </div>
                 </div>
             )}
-        </div>
+        </AdminLayout>
     )
 }

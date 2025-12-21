@@ -17,7 +17,7 @@ import {
     FileText
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useToast } from '@/components/ui/Toast'
 
 interface SettingsData {
@@ -156,28 +156,28 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-olive-600" />
-            </div>
+            <AdminLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <Loader2 size={40} className="animate-spin text-olive-600" />
+                </div>
+            </AdminLayout>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-4xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
                         <div>
-                            <h1 className="text-2xl font-display text-gray-900">Site Settings</h1>
+                            <h1 className="text-xl sm:text-2xl font-display text-gray-900">Site Settings</h1>
                             <p className="text-gray-500 text-sm">Kelola pengaturan website</p>
                         </div>
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 px-6 py-3 bg-olive-600 text-white hover:bg-olive-900 transition-colors disabled:opacity-50"
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-olive-600 text-white hover:bg-olive-900 transition-colors disabled:opacity-50"
                         >
                             {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                             <span>Simpan Semua</span>
@@ -470,6 +470,6 @@ export default function SettingsPage() {
                     </div>
                 </div>
             </main>
-        </div>
+        </AdminLayout>
     )
 }

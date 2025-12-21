@@ -19,7 +19,7 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { format, subDays, startOfMonth, endOfMonth, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useToast } from '@/components/ui/Toast'
 import { formatCurrency } from '@/lib/utils'
 
@@ -240,24 +240,22 @@ export default function AdminReportsPage() {
 
     if (loading && !stats) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 size={40} className="animate-spin text-olive-600" />
-            </div>
+            <AdminLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <Loader2 size={40} className="animate-spin text-olive-600" />
+                </div>
+            </AdminLayout>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h1 className="text-2xl font-display text-gray-900">Reports & Export</h1>
-                            <p className="text-gray-500 text-sm">Analisis data dan export laporan</p>
-                        </div>
+                    <div className="mb-6 sm:mb-8">
+                        <h1 className="text-xl sm:text-2xl font-display text-gray-900">Reports & Export</h1>
+                        <p className="text-gray-500 text-sm">Analisis data dan export laporan</p>
                     </div>
 
                     {/* Date Range & Quick Filters */}
@@ -368,8 +366,8 @@ export default function AdminReportsPage() {
                                     <div key={item.status} className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className={`w-3 h-3 rounded-full ${item.status === 'confirmed' ? 'bg-green-500' :
-                                                    item.status === 'pending' ? 'bg-amber-500' :
-                                                        'bg-red-500'
+                                                item.status === 'pending' ? 'bg-amber-500' :
+                                                    'bg-red-500'
                                                 }`} />
                                             <span className="text-sm capitalize">{item.status}</span>
                                         </div>
@@ -453,6 +451,6 @@ export default function AdminReportsPage() {
                     </div>
                 </div>
             </main>
-        </div>
+        </AdminLayout>
     )
 }

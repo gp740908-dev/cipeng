@@ -19,7 +19,7 @@ import { Booking } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { differenceInDays, parseISO, format } from 'date-fns'
 import { id } from 'date-fns/locale'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useToast } from '@/components/ui/Toast'
 
 export default function AdminBookingsPage() {
@@ -109,26 +109,24 @@ export default function AdminBookingsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
+        <AdminLayout>
             {/* Main Content */}
-            <main className="flex-1 ml-64 p-8">
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 sm:mb-8">
                         <div>
-                            <h2 className="text-2xl font-display text-gray-900">Kelola Booking</h2>
+                            <h2 className="text-xl sm:text-2xl font-display text-gray-900">Kelola Booking</h2>
                             <p className="text-gray-500 text-sm">Konfirmasi dan kelola booking tamu</p>
                         </div>
 
                         {/* Filter */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
                             {(['all', 'pending', 'confirmed', 'cancelled'] as const).map((f) => (
                                 <button
                                     key={f}
                                     onClick={() => setFilter(f)}
-                                    className={`px-4 py-2 text-sm font-medium transition-colors ${filter === f
+                                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === f
                                         ? 'bg-olive-900 text-white'
                                         : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                                         }`}
@@ -322,6 +320,6 @@ export default function AdminBookingsPage() {
                     )}
                 </div>
             </main>
-        </div>
+        </AdminLayout>
     )
 }

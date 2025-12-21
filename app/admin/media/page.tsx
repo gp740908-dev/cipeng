@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { convertToWebP, formatFileSize, getSizeReduction } from '@/lib/imageUtils'
-import AdminSidebar from '@/components/admin/AdminSidebar'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { Media } from '@/types'
 import { useToast } from '@/components/ui/Toast'
 
@@ -196,16 +196,14 @@ export default function MediaLibraryPage() {
     )
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AdminSidebar />
-
-            <main className="flex-1 ml-64 p-8">
+        <AdminLayout>
+            <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
                         <div>
-                            <h1 className="text-2xl font-display text-gray-900">Media Library</h1>
-                            <p className="text-gray-500 text-sm">Kelola gambar dan file</p>
+                            <h1 className="text-xl sm:text-2xl font-display text-gray-900">Media Library</h1>
+                            <p className="text-gray-500 text-sm">Kelola gambar dan file (Auto WebP)</p>
                         </div>
                         <div className="flex items-center gap-3">
                             <input
@@ -498,6 +496,6 @@ export default function MediaLibraryPage() {
                     </div>
                 </div>
             )}
-        </div>
+        </AdminLayout>
     )
 }
