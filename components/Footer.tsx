@@ -66,6 +66,7 @@ export default function Footer() {
             { label: 'All Villas', href: '/villas' },
             { label: 'About Us', href: '/about' },
             { label: 'Journal', href: '/blog' },
+            { label: 'FAQ', href: '/faq' },
             { label: 'Contact', href: '/contact' },
         ],
         legal: [
