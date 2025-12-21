@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 export const metadata: Metadata = {
   title: "StayinUBUD - Luxury Villa Rentals in Ubud, Bali",
@@ -26,8 +27,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="antialiased bg-cream font-body text-primary">
+        <AnalyticsTracker />
         {children}
       </body>
     </html>
   );
 }
+

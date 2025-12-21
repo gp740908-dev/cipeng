@@ -16,7 +16,8 @@ import {
     Image,
     Sparkles,
     LayoutDashboard,
-    Globe
+    Globe,
+    BarChart3
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -25,6 +26,7 @@ const menuGroups = [
         label: 'Main',
         items: [
             { href: '/admin/dashboard', icon: TrendingUp, label: 'Dashboard' },
+            { href: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
         ]
     },
     {
