@@ -50,9 +50,7 @@ export default async function VillaPage({ params }: Props) {
     return (
         <main className="min-h-screen bg-cream">
             <Navbar />
-            <div className="pt-24">
-                <VillaDetails villa={villa} />
-            </div>
+            <VillaDetails villa={villa} />
             <Footer />
             <WhatsAppButton />
             <BackToTop />

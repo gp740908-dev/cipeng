@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, ArrowLeft, Navigation } from 'lucide-react'
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion'
+import { X, Bed, Bath, Users, MapPin, Check, ChevronLeft, ChevronRight, ArrowLeft, Navigation, ChevronDown, Star, Calendar, Sparkles } from 'lucide-react'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import ModernBookingFlow from '@/components/ModernBookingFlow'
@@ -29,10 +29,69 @@ interface VillaDetailsProps {
     villa: Villa
 }
 
+// Scroll reveal component
+function ScrollReveal({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
+    const ref = useRef(null)
+    const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+    return (
+        <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 60 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+        >
+            {children}
+        </motion.div>
+    )
+}
+
+// Text reveal animation component
+function TextReveal({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
+    const ref = useRef(null)
+    const isInView = useInView(ref, { once: true, margin: "-50px" })
+
+    return (
+        <div className="overflow-hidden" ref={ref}>
+            <motion.div
+                initial={{ y: '100%' }}
+                animate={isInView ? { y: 0 } : {}}
+                transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+            >
+                {children}
+            </motion.div>
+        </div>
+    )
+}
+
 export default function VillaDetails({ villa }: VillaDetailsProps) {
     const [selectedImage, setSelectedImage] = useState(0)
     const [showLightbox, setShowLightbox] = useState(false)
     const [showBookingModal, setShowBookingModal] = useState(false)
+
+    // Parallax refs
+    const heroRef = useRef<HTMLDivElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    // Hero parallax
+    const { scrollYProgress: heroScrollProgress } = useScroll({
+        target: heroRef,
+        offset: ["start start", "end start"]
+    })
+
+    const heroY = useTransform(heroScrollProgress, [0, 1], ['0%', '30%'])
+    const heroScale = useTransform(heroScrollProgress, [0, 1], [1, 1.1])
+    const heroOpacity = useTransform(heroScrollProgress, [0, 0.8], [1, 0])
+    const overlayOpacity = useTransform(heroScrollProgress, [0, 0.5], [0.3, 0.7])
+    const textY = useTransform(heroScrollProgress, [0, 1], ['0%', '50%'])
+
+    // Gallery parallax
+    const { scrollYProgress: galleryScrollProgress } = useScroll({
+        target: containerRef,
+        offset: ["start end", "end start"]
+    })
+
+    const galleryY = useTransform(galleryScrollProgress, [0, 1], ['5%', '-5%'])
 
     const nextImage = () => {
         setSelectedImage((prev) => (prev + 1) % villa.images.length)
@@ -44,245 +103,397 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
 
     return (
         <>
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-                {/* Back Link */}
+            {/* Full Screen Hero with Parallax */}
+            <section ref={heroRef} className="relative h-screen overflow-hidden -mt-24">
+                {/* Parallax Background */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-12"
+                    style={{ y: heroY, scale: heroScale }}
+                    className="absolute inset-0"
                 >
-                    <Link
-                        href="/villas"
-                        className="inline-flex items-center gap-2 text-muted hover:text-primary transition-colors text-sm tracking-wide"
-                    >
-                        <ArrowLeft size={16} />
-                        <span>Back to Collection</span>
-                    </Link>
+                    <Image
+                        src={villa.images[0]}
+                        alt={villa.name}
+                        fill
+                        className="object-cover"
+                        priority
+                    />
                 </motion.div>
 
-                {/* Header */}
+                {/* Dynamic Overlay */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="mb-12"
-                >
-                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                        <div>
-                            <h1 className="font-display text-display-md text-primary mb-4">
-                                {villa.name}
-                            </h1>
-                            <div className="flex items-center text-muted">
-                                <MapPin size={16} className="mr-2" />
-                                <span>{villa.location}</span>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className="font-display text-4xl text-primary">
-                                {formatCurrency(villa.price_per_night)}
-                            </p>
-                            <p className="text-muted text-sm">per night</p>
-                        </div>
-                    </div>
-                </motion.div>
+                    style={{ opacity: overlayOpacity }}
+                    className="absolute inset-0 bg-black"
+                />
 
-                {/* Image Gallery */}
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+
+                {/* Hero Content */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="mb-16"
+                    style={{ y: textY, opacity: heroOpacity }}
+                    className="absolute inset-0 flex flex-col justify-end pb-24 px-6 md:px-12"
                 >
-                    {/* Main Image */}
-                    <div
-                        className="relative aspect-[16/9] overflow-hidden cursor-pointer group mb-2"
-                        onClick={() => setShowLightbox(true)}
-                    >
-                        <Image
-                            src={villa.images[selectedImage]}
-                            alt={`${villa.name} - Image ${selectedImage + 1}`}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-102"
-                            priority
-                        />
-                        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
-                    </div>
+                    <div className="max-w-[1400px] mx-auto w-full">
+                        {/* Back Button */}
+                        <Link
+                            href="/villas"
+                            className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-8 text-sm tracking-wide"
+                        >
+                            <ArrowLeft size={16} />
+                            <span>Back to Collection</span>
+                        </Link>
 
-                    {/* Thumbnail Strip */}
-                    <div className="grid grid-cols-6 gap-2">
-                        {villa.images.slice(0, 6).map((image, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setSelectedImage(index)}
-                                className={`relative aspect-square overflow-hidden transition-all
-                                    ${selectedImage === index ? 'ring-2 ring-primary' : 'opacity-70 hover:opacity-100'}
-                                `}
-                            >
-                                <Image
-                                    src={image}
-                                    alt={`${villa.name} thumbnail ${index + 1}`}
-                                    fill
-                                    className="object-cover"
-                                />
-                            </button>
-                        ))}
-                    </div>
-                </motion.div>
-
-                {/* Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 mb-24">
-                    {/* Left: Details */}
-                    <div className="lg:col-span-2 space-y-16">
-                        {/* Key Features */}
+                        {/* Location Badge */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
+                            className="flex items-center gap-2 mb-4"
                         >
-                            <div className="grid grid-cols-3 gap-8 pb-12 border-b border-primary/10">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Bed size={24} className="text-muted" />
-                                        <span className="font-display text-3xl text-primary">{villa.bedrooms}</span>
-                                    </div>
-                                    <p className="text-muted text-sm">Bedrooms</p>
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Bath size={24} className="text-muted" />
-                                        <span className="font-display text-3xl text-primary">{villa.bathrooms}</span>
-                                    </div>
-                                    <p className="text-muted text-sm">Bathrooms</p>
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Users size={24} className="text-muted" />
-                                        <span className="font-display text-3xl text-primary">{villa.max_guests}</span>
-                                    </div>
-                                    <p className="text-muted text-sm">Guests</p>
-                                </div>
+                            <MapPin size={14} className="text-olive-400" />
+                            <span className="text-white/70 text-sm tracking-wide">{villa.location}</span>
+                        </motion.div>
+
+                        {/* Villa Name */}
+                        <div className="overflow-hidden mb-6">
+                            <motion.h1
+                                initial={{ y: 100 }}
+                                animate={{ y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                className="font-display text-5xl md:text-7xl lg:text-8xl text-white"
+                            >
+                                {villa.name}
+                            </motion.h1>
+                        </div>
+
+                        {/* Quick Stats */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6 }}
+                            className="flex items-center gap-8 mb-8"
+                        >
+                            <div className="flex items-center gap-2 text-white/80">
+                                <Bed size={18} />
+                                <span className="text-sm">{villa.bedrooms} Bedrooms</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-white/80">
+                                <Bath size={18} />
+                                <span className="text-sm">{villa.bathrooms} Bathrooms</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-white/80">
+                                <Users size={18} />
+                                <span className="text-sm">Up to {villa.max_guests} Guests</span>
                             </div>
                         </motion.div>
 
-                        {/* Description */}
+                        {/* Price */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
+                            transition={{ delay: 0.7 }}
+                            className="flex items-end gap-4"
                         >
-                            <h2 className="font-display text-2xl text-primary mb-6">About This Villa</h2>
-                            <p className="text-muted leading-relaxed whitespace-pre-line">
-                                {villa.description}
-                            </p>
+                            <span className="font-display text-3xl md:text-4xl text-olive-400">
+                                {formatCurrency(villa.price_per_night)}
+                            </span>
+                            <span className="text-white/50 text-sm mb-1">per night</span>
                         </motion.div>
+                    </div>
+                </motion.div>
 
-                        {/* Amenities */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                        >
-                            <h2 className="font-display text-2xl text-primary mb-6">Amenities</h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {/* Scroll Indicator */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1 }}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                >
+                    <motion.div
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="flex flex-col items-center gap-2 text-white/50"
+                    >
+                        <span className="text-xs tracking-[0.2em] uppercase">Scroll to explore</span>
+                        <ChevronDown size={20} />
+                    </motion.div>
+                </motion.div>
+            </section>
+
+            {/* Story Section - About */}
+            <section className="py-24 md:py-32 bg-cream relative overflow-hidden">
+                {/* Decorative */}
+                <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-olive-100/30 to-transparent pointer-events-none" />
+
+                <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                    <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                        {/* Left - Text */}
+                        <div>
+                            <ScrollReveal>
+                                <p className="text-olive-600 text-xs tracking-[0.3em] uppercase mb-4 flex items-center gap-2">
+                                    <Sparkles size={12} />
+                                    The Experience
+                                </p>
+                            </ScrollReveal>
+
+                            <TextReveal delay={0.1}>
+                                <h2 className="font-display text-4xl md:text-5xl text-gray-900 mb-8">
+                                    Your Private <span className="italic text-olive-600">Sanctuary</span>
+                                </h2>
+                            </TextReveal>
+
+                            <ScrollReveal delay={0.2}>
+                                <p className="text-gray-600 leading-relaxed text-lg mb-8 whitespace-pre-line">
+                                    {villa.description}
+                                </p>
+                            </ScrollReveal>
+
+                            <ScrollReveal delay={0.3}>
+                                <button
+                                    onClick={() => setShowBookingModal(true)}
+                                    className="group inline-flex items-center gap-3 px-8 py-4 bg-olive-900 text-white text-sm tracking-[0.1em] uppercase hover:bg-olive-600 transition-colors"
+                                >
+                                    <span>Book Your Stay</span>
+                                    <motion.span
+                                        className="group-hover:translate-x-1 transition-transform"
+                                    >
+                                        →
+                                    </motion.span>
+                                </button>
+                            </ScrollReveal>
+                        </div>
+
+                        {/* Right - Key Features */}
+                        <div className="grid grid-cols-3 gap-4">
+                            {[
+                                { icon: Bed, value: villa.bedrooms, label: 'Bedrooms' },
+                                { icon: Bath, value: villa.bathrooms, label: 'Bathrooms' },
+                                { icon: Users, value: villa.max_guests, label: 'Max Guests' },
+                            ].map((stat, index) => (
+                                <ScrollReveal key={stat.label} delay={0.2 + index * 0.1}>
+                                    <motion.div
+                                        whileHover={{ y: -5 }}
+                                        className="p-6 md:p-8 bg-white border border-gray-100 text-center"
+                                    >
+                                        <stat.icon size={24} className="mx-auto text-olive-600 mb-4" />
+                                        <p className="font-display text-4xl text-gray-900 mb-2">{stat.value}</p>
+                                        <p className="text-gray-500 text-sm">{stat.label}</p>
+                                    </motion.div>
+                                </ScrollReveal>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Parallax Gallery Section */}
+            <section ref={containerRef} className="relative py-32 bg-gray-900 overflow-hidden">
+                <motion.div
+                    style={{ y: galleryY }}
+                    className="max-w-[1400px] mx-auto px-6 md:px-12"
+                >
+                    <div className="grid md:grid-cols-2 gap-4 md:gap-8">
+                        {/* Main Image */}
+                        <ScrollReveal>
+                            <div
+                                className="relative aspect-[4/5] overflow-hidden cursor-pointer group"
+                                onClick={() => setShowLightbox(true)}
+                            >
+                                <Image
+                                    src={villa.images[selectedImage]}
+                                    alt={`${villa.name} - Image ${selectedImage + 1}`}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="text-white text-sm">{selectedImage + 1} / {villa.images.length}</span>
+                                    <span className="text-white/60 text-sm">Click to expand</span>
+                                </div>
+                            </div>
+                        </ScrollReveal>
+
+                        {/* Thumbnail Grid */}
+                        <div className="grid grid-cols-2 gap-4">
+                            {villa.images.slice(1, 5).map((image, index) => (
+                                <ScrollReveal key={index} delay={0.1 * (index + 1)}>
+                                    <motion.button
+                                        onClick={() => setSelectedImage(index + 1)}
+                                        whileHover={{ scale: 0.98 }}
+                                        className={`relative aspect-square overflow-hidden ${selectedImage === index + 1 ? 'ring-2 ring-olive-400' : ''
+                                            }`}
+                                    >
+                                        <Image
+                                            src={image}
+                                            alt={`${villa.name} thumbnail ${index + 2}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 hover:bg-black/10 transition-colors" />
+                                    </motion.button>
+                                </ScrollReveal>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            </section>
+
+            {/* Amenities Section */}
+            <section className="py-24 md:py-32 bg-white relative">
+                <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                    <div className="grid lg:grid-cols-2 gap-16 items-start">
+                        {/* Left - Amenities */}
+                        <div>
+                            <ScrollReveal>
+                                <p className="text-olive-600 text-xs tracking-[0.3em] uppercase mb-4">
+                                    Premium Amenities
+                                </p>
+                            </ScrollReveal>
+
+                            <TextReveal delay={0.1}>
+                                <h2 className="font-display text-4xl md:text-5xl text-gray-900 mb-12">
+                                    Every Detail <span className="italic text-olive-600">Considered</span>
+                                </h2>
+                            </TextReveal>
+
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
                                 {villa.amenities.map((amenity, index) => (
-                                    <div key={index} className="flex items-center gap-3">
-                                        <Check size={16} className="text-accent" />
-                                        <span className="text-muted">{amenity}</span>
-                                    </div>
+                                    <ScrollReveal key={index} delay={0.05 * index}>
+                                        <motion.div
+                                            whileHover={{ x: 5 }}
+                                            className="flex items-center gap-3 py-3 border-b border-gray-100"
+                                        >
+                                            <Check size={18} className="text-olive-600 flex-shrink-0" />
+                                            <span className="text-gray-700">{amenity}</span>
+                                        </motion.div>
+                                    </ScrollReveal>
                                 ))}
                             </div>
-                        </motion.div>
+                        </div>
 
-                        {/* Location Map */}
-                        {villa.latitude && villa.longitude && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                            >
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="font-display text-2xl text-primary">Location</h2>
+                        {/* Right - Availability Calendar */}
+                        <ScrollReveal delay={0.3}>
+                            <div className="lg:sticky lg:top-32">
+                                <AvailabilityCalendar villaId={villa.id} />
+                            </div>
+                        </ScrollReveal>
+                    </div>
+                </div>
+            </section>
+
+            {/* Location & Nearby Places */}
+            {(villa.latitude && villa.longitude) && (
+                <section className="py-24 md:py-32 bg-olive-100/30 relative overflow-hidden">
+                    <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+                        <div className="text-center mb-16">
+                            <ScrollReveal>
+                                <p className="text-olive-600 text-xs tracking-[0.3em] uppercase mb-4">
+                                    Location
+                                </p>
+                            </ScrollReveal>
+
+                            <TextReveal delay={0.1}>
+                                <h2 className="font-display text-4xl md:text-5xl text-gray-900">
+                                    Discover the <span className="italic text-olive-600">Surroundings</span>
+                                </h2>
+                            </TextReveal>
+                        </div>
+
+                        <div className="grid lg:grid-cols-2 gap-12 items-start">
+                            {/* Map */}
+                            <ScrollReveal>
+                                <div className="relative">
+                                    <VillaMap
+                                        latitude={villa.latitude}
+                                        longitude={villa.longitude}
+                                        villaName={villa.name}
+                                        location={villa.location}
+                                    />
                                     <a
                                         href={`https://www.google.com/maps/dir/?api=1&destination=${villa.latitude},${villa.longitude}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 text-sm text-olive-600 hover:text-olive-900 transition-colors"
+                                        className="mt-4 inline-flex items-center gap-2 text-olive-600 hover:text-olive-900 transition-colors text-sm"
                                     >
                                         <Navigation size={14} />
                                         <span>Get Directions</span>
                                     </a>
                                 </div>
-                                <div className="mb-4">
-                                    <div className="flex items-center text-muted text-sm">
-                                        <MapPin size={14} className="mr-2" />
-                                        <span>{villa.location}</span>
-                                    </div>
-                                </div>
-                                <VillaMap
-                                    latitude={villa.latitude}
-                                    longitude={villa.longitude}
-                                    villaName={villa.name}
-                                    location={villa.location}
-                                />
-                            </motion.div>
-                        )}
+                            </ScrollReveal>
 
-                        {/* Nearby Places */}
-                        {villa.nearby_places && villa.nearby_places.length > 0 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.7 }}
-                            >
-                                <NearbyPlaces places={villa.nearby_places} />
-                            </motion.div>
-                        )}
-
-                        {/* Availability Calendar */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.8 }}
-                        >
-                            <AvailabilityCalendar villaId={villa.id} />
-                        </motion.div>
+                            {/* Nearby Places */}
+                            <ScrollReveal delay={0.2}>
+                                {villa.nearby_places && villa.nearby_places.length > 0 && (
+                                    <NearbyPlaces places={villa.nearby_places} />
+                                )}
+                            </ScrollReveal>
+                        </div>
                     </div>
+                </section>
+            )}
 
-                    {/* Right: Booking Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="lg:sticky lg:top-32 h-fit"
-                    >
-                        <div className="border border-primary/10 p-8">
-                            <div className="mb-8">
-                                <p className="text-muted text-sm mb-2">Starting from</p>
-                                <p className="font-display text-4xl text-primary mb-1">
-                                    {formatCurrency(villa.price_per_night)}
-                                </p>
-                                <p className="text-muted text-sm">per night</p>
-                            </div>
+            {/* Final CTA Section */}
+            <section className="relative py-32 md:py-48 overflow-hidden">
+                {/* Parallax Background */}
+                <div className="absolute inset-0">
+                    <Image
+                        src={villa.images[villa.images.length - 1] || villa.images[0]}
+                        alt="Villa ambiance"
+                        fill
+                        className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/70" />
+                </div>
 
+                {/* Content */}
+                <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-12 text-center">
+                    <ScrollReveal>
+                        <div className="flex items-center justify-center gap-2 mb-6">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={16} className="text-olive-400 fill-olive-400" />
+                            ))}
+                        </div>
+                    </ScrollReveal>
+
+                    <TextReveal delay={0.1}>
+                        <h2 className="font-display text-4xl md:text-6xl lg:text-7xl text-white mb-8">
+                            Ready to <span className="italic text-olive-400">Experience</span> Paradise?
+                        </h2>
+                    </TextReveal>
+
+                    <ScrollReveal delay={0.2}>
+                        <p className="text-white/60 text-lg max-w-2xl mx-auto mb-12">
+                            Book your stay at {villa.name} and discover the perfect blend of luxury and tranquility in the heart of Bali.
+                        </p>
+                    </ScrollReveal>
+
+                    <ScrollReveal delay={0.3}>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <button
                                 onClick={() => setShowBookingModal(true)}
-                                className="w-full bg-primary text-white py-4 text-sm tracking-[0.2em] uppercase hover:bg-secondary transition-colors mb-4"
+                                className="group inline-flex items-center gap-3 px-10 py-5 bg-olive-600 text-white text-sm tracking-[0.15em] uppercase hover:bg-olive-400 transition-colors"
                             >
-                                Check Availability
+                                <Calendar size={18} />
+                                <span>Check Availability</span>
                             </button>
-
                             <a
                                 href={`https://wa.me/6281234567890?text=Hi, I'm interested in ${villa.name}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block w-full text-center border border-primary/20 text-primary py-4 text-sm tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all"
+                                className="inline-flex items-center gap-3 px-10 py-5 border border-white/30 text-white text-sm tracking-[0.15em] uppercase hover:bg-white/10 transition-colors"
                             >
-                                Contact Us
+                                <span>Contact Us</span>
                             </a>
                         </div>
-                    </motion.div>
+                    </ScrollReveal>
+
+                    <ScrollReveal delay={0.4}>
+                        <p className="mt-12 text-white/40 text-sm">
+                            Starting from <span className="text-olive-400 font-display text-2xl">{formatCurrency(villa.price_per_night)}</span> per night
+                        </p>
+                    </ScrollReveal>
                 </div>
-            </div>
+            </section>
 
             {/* Lightbox */}
             <AnimatePresence>
@@ -291,40 +502,60 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-primary flex items-center justify-center"
+                        className="fixed inset-0 z-50 bg-black flex items-center justify-center"
                         onClick={() => setShowLightbox(false)}
                     >
                         <button
                             onClick={() => setShowLightbox(false)}
-                            className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors"
+                            className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors z-10"
                         >
                             <X size={32} />
                         </button>
 
                         <button
                             onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                            className="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-primary transition-all"
+                            className="absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
                         >
                             <ChevronLeft size={24} />
                         </button>
 
                         <button
                             onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                            className="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-primary transition-all"
+                            className="absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
                         >
                             <ChevronRight size={24} />
                         </button>
 
-                        <div className="relative w-full max-w-5xl aspect-[16/10] mx-8">
+                        <motion.div
+                            key={selectedImage}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="relative w-full max-w-6xl aspect-[16/10] mx-8"
+                        >
                             <Image
                                 src={villa.images[selectedImage]}
                                 alt={`${villa.name} - Image ${selectedImage + 1}`}
                                 fill
                                 className="object-contain"
                             />
+                        </motion.div>
+
+                        {/* Thumbnails */}
+                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                            {villa.images.map((img, index) => (
+                                <button
+                                    key={index}
+                                    onClick={(e) => { e.stopPropagation(); setSelectedImage(index); }}
+                                    className={`w-16 h-12 relative overflow-hidden transition-all ${index === selectedImage ? 'ring-2 ring-white' : 'opacity-50 hover:opacity-100'
+                                        }`}
+                                >
+                                    <Image src={img} alt="" fill className="object-cover" />
+                                </button>
+                            ))}
                         </div>
 
-                        <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 text-sm">
+                        <p className="absolute bottom-24 left-1/2 -translate-x-1/2 text-white/60 text-sm">
                             {selectedImage + 1} / {villa.images.length}
                         </p>
                     </motion.div>
