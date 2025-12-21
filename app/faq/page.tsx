@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
     ChevronDown,
@@ -23,6 +23,26 @@ import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import BackToTop from '@/components/BackToTop'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+
+// Settings interface
+interface SiteSettings {
+    contact: {
+        phone: string
+        email: string
+        whatsapp: string
+        address: string
+    }
+}
+
+const defaultSettings: SiteSettings = {
+    contact: {
+        phone: '+62 812 3456 7890',
+        email: 'hello@stayinubud.com',
+        whatsapp: '6281234567890',
+        address: 'Ubud, Bali, Indonesia'
+    }
+}
 
 // FAQ Categories
 const categories = [
@@ -243,6 +263,33 @@ export default function FAQPage() {
     const [activeCategory, setActiveCategory] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [openIndex, setOpenIndex] = useState<number | null>(null)
+    const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
+
+    // Fetch site settings
+    useEffect(() => {
+        async function fetchSettings() {
+            try {
+                const supabase = createClient()
+                const { data } = await supabase
+                    .from('site_settings')
+                    .select('key, value')
+
+                if (data && data.length > 0) {
+                    const newSettings = { ...defaultSettings }
+                    data.forEach((row) => {
+                        if (row.key in newSettings) {
+                            (newSettings as any)[row.key] = row.value
+                        }
+                    })
+                    setSettings(newSettings)
+                }
+            } catch (error) {
+                console.error('Error fetching settings:', error)
+            }
+        }
+
+        fetchSettings()
+    }, [])
 
     // Filter FAQs based on category and search
     const filteredFaqs = faqs.filter(faq => {
@@ -324,8 +371,8 @@ export default function FAQPage() {
                                     setOpenIndex(null)
                                 }}
                                 className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 whitespace-nowrap text-xs sm:text-sm font-medium transition-all ${activeCategory === category.id
-                                        ? 'bg-olive-900 text-white'
-                                        : 'bg-white text-gray-600 hover:bg-olive-100 hover:text-olive-700 border border-gray-100'
+                                    ? 'bg-olive-900 text-white'
+                                    : 'bg-white text-gray-600 hover:bg-olive-100 hover:text-olive-700 border border-gray-100'
                                     }`}
                             >
                                 <category.icon size={16} />
@@ -411,7 +458,7 @@ export default function FAQPage() {
                             <ScrollReveal delay={0.3}>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <a
-                                        href="https://wa.me/6281234567890"
+                                        href={`https://wa.me/${settings.contact.whatsapp}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-green-600 text-white text-sm tracking-wider uppercase hover:bg-green-500 transition-colors"
@@ -442,8 +489,8 @@ export default function FAQPage() {
                                     </div>
                                     <h3 className="font-display text-xl text-gray-900 mb-2">Call Us</h3>
                                     <p className="text-gray-500 text-sm mb-3">Available 24/7 for urgent inquiries</p>
-                                    <a href="tel:+6281234567890" className="text-olive-600 font-medium hover:text-olive-700">
-                                        +62 812-3456-7890
+                                    <a href={`tel:${settings.contact.phone.replace(/\s/g, '')}`} className="text-olive-600 font-medium hover:text-olive-700">
+                                        {settings.contact.phone}
                                     </a>
                                 </motion.div>
                             </ScrollReveal>
@@ -458,8 +505,8 @@ export default function FAQPage() {
                                     </div>
                                     <h3 className="font-display text-xl text-gray-900 mb-2">Email Us</h3>
                                     <p className="text-gray-500 text-sm mb-3">We respond within 24 hours</p>
-                                    <a href="mailto:info@stayinubud.com" className="text-olive-600 font-medium hover:text-olive-700">
-                                        info@stayinubud.com
+                                    <a href={`mailto:${settings.contact.email}`} className="text-olive-600 font-medium hover:text-olive-700">
+                                        {settings.contact.email}
                                     </a>
                                 </motion.div>
                             </ScrollReveal>
@@ -491,7 +538,7 @@ export default function FAQPage() {
                                     <h3 className="font-display text-xl text-gray-900 mb-2">Visit Us</h3>
                                     <p className="text-gray-500 text-sm mb-3">Our office location</p>
                                     <p className="text-olive-600 font-medium">
-                                        Ubud, Bali, Indonesia
+                                        {settings.contact.address}
                                     </p>
                                 </motion.div>
                             </ScrollReveal>

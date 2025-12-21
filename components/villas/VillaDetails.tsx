@@ -249,20 +249,6 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                     {villa.description}
                                 </p>
                             </ScrollReveal>
-
-                            <ScrollReveal delay={0.3}>
-                                <button
-                                    onClick={() => setShowBookingModal(true)}
-                                    className="group inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-olive-900 text-white text-xs sm:text-sm tracking-[0.1em] uppercase hover:bg-olive-600 transition-colors"
-                                >
-                                    <span>Book Your Stay</span>
-                                    <motion.span
-                                        className="group-hover:translate-x-1 transition-transform"
-                                    >
-                                        →
-                                    </motion.span>
-                                </button>
-                            </ScrollReveal>
                         </div>
 
                         {/* Right - Key Features */}
@@ -335,8 +321,8 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                         key={index}
                                         onClick={() => setSelectedImage(index)}
                                         className={`relative flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 overflow-hidden transition-all ${selectedImage === index
-                                                ? 'ring-2 ring-olive-400 opacity-100'
-                                                : 'opacity-60 hover:opacity-100'
+                                            ? 'ring-2 ring-olive-400 opacity-100'
+                                            : 'opacity-60 hover:opacity-100'
                                             }`}
                                     >
                                         <Image

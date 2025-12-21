@@ -1,12 +1,33 @@
 'use client'
 
 import { motion, useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Mail, Phone, MapPin, Send, Check, ArrowUpRight } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+
+// Settings interface
+interface SiteSettings {
+    contact: {
+        phone: string
+        email: string
+        whatsapp: string
+        address: string
+    }
+}
+
+const defaultSettings: SiteSettings = {
+    contact: {
+        phone: '+62 812 3456 7890',
+        email: 'hello@stayinubud.com',
+        whatsapp: '6281234567890',
+        address: 'Ubud, Bali, Indonesia'
+    }
+}
 
 export default function ContactContent() {
     const formRef = useRef(null)
     const isFormInView = useInView(formRef, { once: true, margin: "-100px" })
+    const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
 
     const [formData, setFormData] = useState({
         name: '',
@@ -16,6 +37,32 @@ export default function ContactContent() {
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
+
+    // Fetch site settings
+    useEffect(() => {
+        async function fetchSettings() {
+            try {
+                const supabase = createClient()
+                const { data } = await supabase
+                    .from('site_settings')
+                    .select('key, value')
+
+                if (data && data.length > 0) {
+                    const newSettings = { ...defaultSettings }
+                    data.forEach((row) => {
+                        if (row.key in newSettings) {
+                            (newSettings as any)[row.key] = row.value
+                        }
+                    })
+                    setSettings(newSettings)
+                }
+            } catch (error) {
+                console.error('Error fetching settings:', error)
+            }
+        }
+
+        fetchSettings()
+    }, [])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -30,23 +77,24 @@ export default function ContactContent() {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
+    // Dynamic contact info using settings
     const contactInfo = [
         {
             icon: Mail,
             label: 'Email',
-            value: 'hello@stayinubud.com',
-            href: 'mailto:hello@stayinubud.com'
+            value: settings.contact.email,
+            href: `mailto:${settings.contact.email}`
         },
         {
             icon: Phone,
             label: 'Phone',
-            value: '+62 361 234 567',
-            href: 'tel:+62361234567'
+            value: settings.contact.phone,
+            href: `tel:${settings.contact.phone.replace(/\s/g, '')}`
         },
         {
             icon: MapPin,
             label: 'Address',
-            value: 'Jalan Raya Ubud, Bali 80571',
+            value: settings.contact.address,
             href: 'https://maps.google.com/?q=Ubud,Bali'
         },
     ]

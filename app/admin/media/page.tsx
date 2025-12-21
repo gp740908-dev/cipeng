@@ -19,6 +19,7 @@ import {
     Plus
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { convertToWebP, formatFileSize, getSizeReduction } from '@/lib/imageUtils'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import { Media } from '@/types'
 import { useToast } from '@/components/ui/Toast'
@@ -81,11 +82,24 @@ export default function MediaLibraryPage() {
         if (!files || files.length === 0) return
 
         setUploading(true)
-        const loadingId = toast.loading('Mengupload file...')
+        const loadingId = toast.loading('Mengkonversi dan mengupload file...')
 
         try {
-            for (const file of Array.from(files)) {
-                const fileExt = file.name.split('.').pop()
+            let successCount = 0
+            let totalSaved = 0
+
+            for (const originalFile of Array.from(files)) {
+                // Convert image to WebP format
+                let file = originalFile
+                const originalSize = originalFile.size
+
+                if (originalFile.type.startsWith('image/') && originalFile.type !== 'image/svg+xml') {
+                    file = await convertToWebP(originalFile, 0.85)
+                    const saved = originalSize - file.size
+                    if (saved > 0) totalSaved += saved
+                }
+
+                const fileExt = file.name.split('.').pop() || 'webp'
                 const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
                 const filePath = `media/${selectedFolder === 'all' ? 'general' : selectedFolder}/${fileName}`
 
@@ -106,7 +120,7 @@ export default function MediaLibraryPage() {
                     .from('media')
                     .insert([{
                         filename: fileName,
-                        original_name: file.name,
+                        original_name: originalFile.name,
                         url: urlData.publicUrl,
                         file_type: file.type.startsWith('image/') ? 'image' :
                             file.type.startsWith('video/') ? 'video' : 'document',
@@ -115,9 +129,14 @@ export default function MediaLibraryPage() {
                     }])
 
                 if (dbError) throw dbError
+                successCount++
             }
 
-            toast.update(loadingId, { type: 'success', title: `${files.length} file berhasil diupload` })
+            const savedMsg = totalSaved > 0 ? ` (Hemat ${formatFileSize(totalSaved)})` : ''
+            toast.update(loadingId, {
+                type: 'success',
+                title: `${successCount} file berhasil diupload ke WebP${savedMsg}`
+            })
             fetchMedia()
         } catch (error: any) {
             console.error('Error uploading:', error)
