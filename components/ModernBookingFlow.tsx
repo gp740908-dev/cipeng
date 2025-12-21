@@ -12,6 +12,7 @@ import {
     ChevronRight,
     Loader2,
     MessageCircle,
+    Tag,
     Phone,
     Mail,
     MapPin,
@@ -54,6 +55,18 @@ export default function ModernBookingFlow({ villa, onClose }: ModernBookingFlowP
     const [specialRequests, setSpecialRequests] = useState('')
     const [paymentMethod, setPaymentMethod] = useState<'transfer' | 'whatsapp'>('whatsapp')
 
+    // Promo code state
+    const [promoCode, setPromoCode] = useState('')
+    const [promoLoading, setPromoLoading] = useState(false)
+    const [promoApplied, setPromoApplied] = useState<{
+        id: string
+        name: string
+        discount_type: 'percentage' | 'fixed'
+        discount_value: number
+        max_discount: number | null
+    } | null>(null)
+    const [promoError, setPromoError] = useState('')
+
     // Prevent body scroll when modal is open
     useEffect(() => {
         document.body.style.overflow = 'hidden'
@@ -66,7 +79,21 @@ export default function ModernBookingFlow({ villa, onClose }: ModernBookingFlowP
     const nights = checkIn && checkOut ? differenceInDays(parseISO(checkOut), parseISO(checkIn)) : 0
     const subtotal = villa.price_per_night * nights
     const serviceFee = Math.round(subtotal * 0.05)
-    const totalPrice = subtotal + serviceFee
+
+    // Calculate discount
+    let discountAmount = 0
+    if (promoApplied) {
+        if (promoApplied.discount_type === 'percentage') {
+            discountAmount = Math.round(subtotal * (promoApplied.discount_value / 100))
+            // Apply max discount cap
+            if (promoApplied.max_discount && discountAmount > promoApplied.max_discount) {
+                discountAmount = promoApplied.max_discount
+            }
+        } else {
+            discountAmount = promoApplied.discount_value
+        }
+    }
+    const totalPrice = subtotal + serviceFee - discountAmount
 
     const minDate = format(new Date(), 'yyyy-MM-dd')
     const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || '6281234567890'
@@ -101,6 +128,91 @@ export default function ModernBookingFlow({ villa, onClose }: ModernBookingFlowP
         if (currentIndex > 0) {
             setCurrentStep(steps[currentIndex - 1].id)
         }
+    }
+
+    // Validate promo code
+    const validatePromoCode = async () => {
+        if (!promoCode.trim()) {
+            setPromoError('Masukkan kode promo')
+            return
+        }
+
+        setPromoLoading(true)
+        setPromoError('')
+
+        try {
+            const { data, error } = await supabase
+                .from('promos')
+                .select('*')
+                .ilike('code', promoCode.trim())
+                .eq('is_active', true)
+                .single()
+
+            if (error || !data) {
+                setPromoError('Kode promo tidak valid')
+                setPromoApplied(null)
+                return
+            }
+
+            // Check validity dates
+            const now = new Date()
+            const validFrom = new Date(data.valid_from)
+            const validUntil = data.valid_until ? new Date(data.valid_until) : null
+
+            if (validFrom > now) {
+                setPromoError('Kode promo belum berlaku')
+                setPromoApplied(null)
+                return
+            }
+
+            if (validUntil && validUntil < now) {
+                setPromoError('Kode promo sudah kadaluarsa')
+                setPromoApplied(null)
+                return
+            }
+
+            // Check usage limit
+            if (data.usage_limit && data.used_count >= data.usage_limit) {
+                setPromoError('Kode promo sudah mencapai batas penggunaan')
+                setPromoApplied(null)
+                return
+            }
+
+            // Check minimum stay
+            if (data.min_stay_nights && nights < data.min_stay_nights) {
+                setPromoError(`Minimal menginap ${data.min_stay_nights} malam`)
+                setPromoApplied(null)
+                return
+            }
+
+            // Check minimum booking amount
+            if (data.min_booking_amount && subtotal < data.min_booking_amount) {
+                setPromoError(`Minimal booking ${formatCurrency(data.min_booking_amount)}`)
+                setPromoApplied(null)
+                return
+            }
+
+            // Promo valid!
+            setPromoApplied({
+                id: data.id,
+                name: data.name,
+                discount_type: data.discount_type,
+                discount_value: data.discount_value,
+                max_discount: data.max_discount_amount,
+            })
+            setPromoError('')
+        } catch (error) {
+            console.error('Error validating promo:', error)
+            setPromoError('Gagal memvalidasi kode promo')
+        } finally {
+            setPromoLoading(false)
+        }
+    }
+
+    const removePromo = () => {
+        setPromoApplied(null)
+        setPromoCode('')
+        setPromoError('')
     }
 
     const handleSubmitBooking = async () => {
@@ -170,7 +282,8 @@ ${specialRequests ? `\nSpecial Requests:\n${specialRequests}` : ''}
 💰 *Price Breakdown*
 ━━━━━━━━━━━━━━━
 ${formatCurrency(villa.price_per_night)} × ${nights} night${nights > 1 ? 's' : ''} = ${formatCurrency(subtotal)}
-Service Fee (5%): ${formatCurrency(serviceFee)}
+Service Fee (5%): ${formatCurrency(serviceFee)}${promoApplied ? `
+🏷️ Promo (${promoApplied.name}): -${formatCurrency(discountAmount)}` : ''}
 ━━━━━━━━━━━━━━━
 *TOTAL: ${formatCurrency(totalPrice)}*
 
@@ -443,6 +556,53 @@ Please confirm villa availability. Thank you! 🙏
                                     </div>
                                 </div>
 
+                                {/* Promo Code Input */}
+                                <div className="border border-olive-200 p-4">
+                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Promo Code</p>
+                                    {promoApplied ? (
+                                        <div className="flex items-center justify-between bg-olive-100/50 p-3">
+                                            <div className="flex items-center gap-2">
+                                                <Tag size={16} className="text-olive-600" />
+                                                <div>
+                                                    <p className="font-medium text-olive-700">{promoApplied.name}</p>
+                                                    <p className="text-xs text-olive-600">
+                                                        {promoApplied.discount_type === 'percentage'
+                                                            ? `${promoApplied.discount_value}% OFF`
+                                                            : `${formatCurrency(promoApplied.discount_value)} OFF`
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={removePromo}
+                                                className="text-xs text-red-500 hover:text-red-700"
+                                            >
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={promoCode}
+                                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                                placeholder="Masukkan kode promo"
+                                                className="flex-1 px-3 py-2 border border-gray-200 focus:border-olive-600 outline-none text-sm font-mono uppercase"
+                                            />
+                                            <button
+                                                onClick={validatePromoCode}
+                                                disabled={promoLoading}
+                                                className="px-4 py-2 bg-olive-600 text-white text-sm hover:bg-olive-700 disabled:opacity-50 flex items-center gap-1"
+                                            >
+                                                {promoLoading ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {promoError && (
+                                        <p className="text-xs text-red-500 mt-2">{promoError}</p>
+                                    )}
+                                </div>
+
                                 {/* Price Breakdown */}
                                 <div className="border border-olive-200 p-5 space-y-3">
                                     <div className="flex justify-between text-gray-600 text-sm">
@@ -453,6 +613,15 @@ Please confirm villa availability. Thank you! 🙏
                                         <span>Service fee (5%)</span>
                                         <span>{formatCurrency(serviceFee)}</span>
                                     </div>
+                                    {discountAmount > 0 && (
+                                        <div className="flex justify-between text-green-600 text-sm">
+                                            <span className="flex items-center gap-1">
+                                                <Tag size={12} />
+                                                Promo Discount
+                                            </span>
+                                            <span>-{formatCurrency(discountAmount)}</span>
+                                        </div>
+                                    )}
                                     <div className="border-t border-olive-200 pt-3 flex justify-between text-lg">
                                         <span className="text-gray-900 font-medium">Total</span>
                                         <span className="font-display text-olive-900">{formatCurrency(totalPrice)}</span>
@@ -629,8 +798,8 @@ Please confirm villa availability. Thank you! 🙏
                                 onClick={nextStep}
                                 disabled={!canProceed() || isLoading}
                                 className={`flex items-center gap-2 px-6 py-3 font-medium transition-all ${canProceed()
-                                        ? 'bg-olive-900 text-white hover:bg-olive-600'
-                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    ? 'bg-olive-900 text-white hover:bg-olive-600'
+                                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                     }`}
                             >
                                 {isLoading ? (
