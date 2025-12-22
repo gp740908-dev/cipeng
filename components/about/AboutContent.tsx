@@ -1,19 +1,44 @@
 'use client'
 
-import { motion, useInView } from 'framer-motion'
-import Image from 'next/image'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import OptimizedImage from '@/components/OptimizedImage'
 
 export default function AboutContent() {
-    const storyRef = useRef(null)
-    const valuesRef = useRef(null)
-    const teamRef = useRef(null)
+    const storyRef = useRef<HTMLElement>(null)
+    const valuesRef = useRef<HTMLElement>(null)
+    const teamRef = useRef<HTMLElement>(null)
 
-    const isStoryInView = useInView(storyRef, { once: true, margin: "-100px" })
-    const isValuesInView = useInView(valuesRef, { once: true, margin: "-100px" })
-    const isTeamInView = useInView(teamRef, { once: true, margin: "-100px" })
+    const [isStoryInView, setIsStoryInView] = useState(false)
+    const [isValuesInView, setIsValuesInView] = useState(false)
+    const [isTeamInView, setIsTeamInView] = useState(false)
+
+    useEffect(() => {
+        const options = { rootMargin: '-100px', threshold: 0.1 }
+
+        const storyObserver = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) setIsStoryInView(true)
+        }, options)
+
+        const valuesObserver = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) setIsValuesInView(true)
+        }, options)
+
+        const teamObserver = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) setIsTeamInView(true)
+        }, options)
+
+        if (storyRef.current) storyObserver.observe(storyRef.current)
+        if (valuesRef.current) valuesObserver.observe(valuesRef.current)
+        if (teamRef.current) teamObserver.observe(teamRef.current)
+
+        return () => {
+            storyObserver.disconnect()
+            valuesObserver.disconnect()
+            teamObserver.disconnect()
+        }
+    }, [])
 
     const values = [
         {
@@ -63,14 +88,9 @@ export default function AboutContent() {
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                         {/* Image */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={isStoryInView ? { opacity: 1, x: 0 } : {}}
-                            transition={{ duration: 0.8 }}
-                            className="relative"
-                        >
+                        <div className={`relative ${isStoryInView ? 'animate-slide-left' : 'opacity-0'}`}>
                             <div className="aspect-[4/5] relative overflow-hidden">
-                                <Image
+                                <OptimizedImage
                                     src="https://images.unsplash.com/photo-1604999333679-b86d54738315?w=800&q=80"
                                     alt="Balinese villa"
                                     fill
@@ -79,14 +99,10 @@ export default function AboutContent() {
                             </div>
                             {/* Decorative Element */}
                             <div className="absolute -bottom-8 -right-8 w-48 h-48 border border-accent/30 -z-10" />
-                        </motion.div>
+                        </div>
 
                         {/* Content */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={isStoryInView ? { opacity: 1, x: 0 } : {}}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                        >
+                        <div className={isStoryInView ? 'animate-slide-right' : 'opacity-0'}>
                             <p className="text-muted text-sm tracking-[0.3em] uppercase mb-6">
                                 Our Story
                             </p>
@@ -112,7 +128,7 @@ export default function AboutContent() {
                                     resonate long after departure.
                                 </p>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -120,12 +136,7 @@ export default function AboutContent() {
             {/* Values Section */}
             <section ref={valuesRef} className="py-32 bg-primary text-white">
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={isValuesInView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.8 }}
-                        className="max-w-2xl mb-24"
-                    >
+                    <div className={`max-w-2xl mb-24 ${isValuesInView ? 'animate-fade-up' : 'opacity-0'}`}>
                         <p className="text-accent text-sm tracking-[0.3em] uppercase mb-6">
                             Our Values
                         </p>
@@ -134,28 +145,28 @@ export default function AboutContent() {
                             <br />
                             <span className="italic text-accent">everything</span> we do
                         </h2>
-                    </motion.div>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10">
-                        {values.map((value, index) => (
-                            <motion.div
-                                key={value.number}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={isValuesInView ? { opacity: 1, y: 0 } : {}}
-                                transition={{ duration: 0.6, delay: index * 0.1 }}
-                                className="bg-primary p-12 group hover:bg-secondary transition-colors duration-500"
-                            >
-                                <span className="text-accent text-sm tracking-widest mb-8 block">
-                                    {value.number}
-                                </span>
-                                <h3 className="font-display text-3xl mb-6 group-hover:text-accent transition-colors">
-                                    {value.title}
-                                </h3>
-                                <p className="text-white/60 leading-relaxed">
-                                    {value.description}
-                                </p>
-                            </motion.div>
-                        ))}
+                        {values.map((value, index) => {
+                            const staggerClass = `stagger-${index + 1}`
+                            return (
+                                <div
+                                    key={value.number}
+                                    className={`bg-primary p-12 group hover:bg-secondary transition-colors duration-500 ${isValuesInView ? `animate-fade-up ${staggerClass}` : 'opacity-0'}`}
+                                >
+                                    <span className="text-accent text-sm tracking-widest mb-8 block">
+                                        {value.number}
+                                    </span>
+                                    <h3 className="font-display text-3xl mb-6 group-hover:text-accent transition-colors">
+                                        {value.title}
+                                    </h3>
+                                    <p className="text-white/60 leading-relaxed">
+                                        {value.description}
+                                    </p>
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </section>
@@ -163,12 +174,7 @@ export default function AboutContent() {
             {/* Team Section */}
             <section ref={teamRef} className="py-32 bg-light">
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={isTeamInView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.8 }}
-                        className="flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-8"
-                    >
+                    <div className={`flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-8 ${isTeamInView ? 'animate-fade-up' : 'opacity-0'}`}>
                         <div>
                             <p className="text-muted text-sm tracking-[0.3em] uppercase mb-4">
                                 The Team
@@ -180,31 +186,31 @@ export default function AboutContent() {
                         <p className="text-muted max-w-md">
                             Passionate individuals dedicated to creating extraordinary experiences.
                         </p>
-                    </motion.div>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {team.map((member, index) => (
-                            <motion.div
-                                key={member.name}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={isTeamInView ? { opacity: 1, y: 0 } : {}}
-                                transition={{ duration: 0.6, delay: index * 0.15 }}
-                                className="group"
-                            >
-                                <div className="aspect-[3/4] relative overflow-hidden mb-6">
-                                    <Image
-                                        src={member.image}
-                                        alt={member.name}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                    />
+                        {team.map((member, index) => {
+                            const staggerClass = `stagger-${index + 1}`
+                            return (
+                                <div
+                                    key={member.name}
+                                    className={`group ${isTeamInView ? `animate-fade-up ${staggerClass}` : 'opacity-0'}`}
+                                >
+                                    <div className="aspect-[3/4] relative overflow-hidden mb-6">
+                                        <OptimizedImage
+                                            src={member.image}
+                                            alt={member.name}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
+                                    </div>
+                                    <h3 className="font-display text-2xl text-primary mb-1">
+                                        {member.name}
+                                    </h3>
+                                    <p className="text-muted">{member.role}</p>
                                 </div>
-                                <h3 className="font-display text-2xl text-primary mb-1">
-                                    {member.name}
-                                </h3>
-                                <p className="text-muted">{member.role}</p>
-                            </motion.div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </div>
             </section>
@@ -212,12 +218,7 @@ export default function AboutContent() {
             {/* CTA Section */}
             <section className="py-32 bg-cream">
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                    >
+                    <div className="animate-fade-up">
                         <h2 className="font-display text-display-md text-primary mb-8">
                             Ready to experience
                             <br />
@@ -230,7 +231,7 @@ export default function AboutContent() {
                             <span>Explore Our Collection</span>
                             <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         </Link>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
         </>

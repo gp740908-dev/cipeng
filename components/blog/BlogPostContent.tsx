@@ -1,12 +1,11 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Calendar, User, ArrowLeft, Share2 } from 'lucide-react'
 import { BlogPost } from '@/types'
 import { format, parseISO } from 'date-fns'
 import { id } from 'date-fns/locale'
+import OptimizedImage from '@/components/OptimizedImage'
 
 interface BlogPostContentProps {
     post: BlogPost
@@ -100,11 +99,7 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
     return (
         <div className="container mx-auto px-4 max-w-4xl">
             {/* Back Link */}
-            <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="mb-8"
-            >
+            <div className="mb-8 animate-slide-left">
                 <Link
                     href="/blog"
                     className="inline-flex items-center text-sage hover:text-sage-dark transition-colors"
@@ -112,32 +107,23 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
                     <ArrowLeft size={20} className="mr-2" />
                     Kembali ke Blog
                 </Link>
-            </motion.div>
+            </div>
 
             {/* Cover Image */}
             {post.cover_image && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="relative h-64 md:h-96 rounded-2xl overflow-hidden mb-8"
-                >
-                    <Image
+                <div className="relative h-64 md:h-96 rounded-2xl overflow-hidden mb-8 animate-fade-up">
+                    <OptimizedImage
                         src={post.cover_image}
                         alt={post.title}
                         fill
                         className="object-cover"
                         priority
                     />
-                </motion.div>
+                </div>
             )}
 
             {/* Header */}
-            <motion.header
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="mb-8"
-            >
+            <header className="mb-8 animate-fade-up stagger-1">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-olive mb-6">
                     {post.title}
                 </h1>
@@ -161,25 +147,15 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
                         Bagikan
                     </button>
                 </div>
-            </motion.header>
+            </header>
 
             {/* Content */}
-            <motion.article
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="prose prose-lg max-w-none bg-white rounded-2xl shadow-lg p-8 md:p-12"
-            >
+            <article className="prose prose-lg max-w-none bg-white rounded-2xl shadow-lg p-8 md:p-12 animate-fade-up stagger-2">
                 {renderContent(post.content)}
-            </motion.article>
+            </article>
 
             {/* Related Articles CTA */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mt-12 text-center"
-            >
+            <div className="mt-12 text-center animate-fade-up stagger-3">
                 <Link
                     href="/blog"
                     className="inline-flex items-center bg-sage text-white px-6 py-3 rounded-lg hover:bg-sage-dark transition-colors"
@@ -187,7 +163,7 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
                     <ArrowLeft size={20} className="mr-2" />
                     Lihat Artikel Lainnya
                 </Link>
-            </motion.div>
+            </div>
         </div>
     )
 }

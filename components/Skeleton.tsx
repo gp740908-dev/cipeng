@@ -1,11 +1,8 @@
-import { motion } from 'framer-motion'
-
 interface SkeletonProps {
     className?: string
     variant?: 'text' | 'circular' | 'rectangular'
     width?: string | number
     height?: string | number
-    animate?: boolean
 }
 
 export function Skeleton({
@@ -13,9 +10,8 @@ export function Skeleton({
     variant = 'rectangular',
     width,
     height,
-    animate = true,
 }: SkeletonProps) {
-    const baseClasses = 'bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 bg-[length:200%_100%]'
+    const baseClasses = 'skeleton'
 
     const variantClasses = {
         text: 'h-4 rounded',
@@ -28,26 +24,9 @@ export function Skeleton({
         height: height || (variant === 'text' ? '1rem' : '100%'),
     }
 
-    if (animate) {
-        return (
-            <motion.div
-                className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-                style={style}
-                animate={{
-                    backgroundPosition: ['0% 0%', '100% 0%'],
-                }}
-                transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: 'linear',
-                }}
-            />
-        )
-    }
-
     return (
         <div
-            className={`${baseClasses} ${variantClasses[variant]} ${className} animate-shimmer`}
+            className={`${baseClasses} ${variantClasses[variant]} ${className}`}
             style={style}
         />
     )

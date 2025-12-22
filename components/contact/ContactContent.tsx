@@ -1,6 +1,5 @@
 'use client'
 
-import { motion, useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { Mail, Phone, MapPin, Send, Check, ArrowUpRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -25,8 +24,8 @@ const defaultSettings: SiteSettings = {
 }
 
 export default function ContactContent() {
-    const formRef = useRef(null)
-    const isFormInView = useInView(formRef, { once: true, margin: "-100px" })
+    const formRef = useRef<HTMLElement>(null)
+    const [isFormInView, setIsFormInView] = useState(false)
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings)
 
     const [formData, setFormData] = useState({
@@ -37,6 +36,18 @@ export default function ContactContent() {
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
+
+    // Intersection Observer
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) setIsFormInView(true)
+            },
+            { rootMargin: '-100px' }
+        )
+        if (formRef.current) observer.observe(formRef.current)
+        return () => observer.disconnect()
+    }, [])
 
     // Fetch site settings
     useEffect(() => {
@@ -104,11 +115,7 @@ export default function ContactContent() {
             <div className="max-w-[1400px] mx-auto px-6 md:px-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
                     {/* Left: Info */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={isFormInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.8 }}
-                    >
+                    <div className={isFormInView ? 'animate-slide-left' : 'opacity-0'}>
                         <p className="text-muted text-sm tracking-[0.3em] uppercase mb-6">
                             Get in Touch
                         </p>
@@ -163,17 +170,13 @@ export default function ContactContent() {
                                 />
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
 
                     {/* Right: Form */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={isFormInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
+                    <div className={isFormInView ? 'animate-slide-right' : 'opacity-0'}>
                         {isSubmitted ? (
                             <div className="h-full flex items-center justify-center">
-                                <div className="text-center">
+                                <div className="text-center animate-scale-in">
                                     <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-6">
                                         <Check size={32} />
                                     </div>
@@ -271,7 +274,7 @@ export default function ContactContent() {
                                 </button>
                             </form>
                         )}
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </section>

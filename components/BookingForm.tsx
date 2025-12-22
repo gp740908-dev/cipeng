@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
 import { Calendar as CalendarIcon, Loader2, AlertCircle } from 'lucide-react'
 import { format, addDays, parseISO, isBefore, isAfter } from 'date-fns'
 import { Villa } from '@/types'
@@ -169,12 +168,7 @@ export default function BookingForm({ villa }: BookingFormProps) {
     const totalPrice = checkIn && checkOut ? calculateTotalPrice(villa.price_per_night, checkIn, checkOut) : 0
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl shadow-2xl p-8 sticky top-24"
-        >
+        <div className="bg-white rounded-2xl shadow-2xl p-8 sticky top-24 animate-fade-up">
             <h2 className="text-2xl font-bold text-olive mb-6">Book Your Stay</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -307,12 +301,10 @@ export default function BookingForm({ villa }: BookingFormProps) {
                 )}
 
                 {/* Submit Button */}
-                <motion.button
-                    whileHover={{ scale: loading ? 1 : 1.02 }}
-                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                <button
                     type="submit"
                     disabled={loading || checkingAvailability}
-                    className="w-full bg-sage text-white py-4 rounded-lg font-semibold hover:bg-sage-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    className="w-full bg-sage text-white py-4 rounded-lg font-semibold hover:bg-sage-dark hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center space-x-2"
                 >
                     {loading ? (
                         <>
@@ -327,12 +319,12 @@ export default function BookingForm({ villa }: BookingFormProps) {
                     ) : (
                         <span>Book Now</span>
                     )}
-                </motion.button>
+                </button>
 
                 <p className="text-xs text-gray-500 text-center">
                     You won't be charged yet. We'll confirm your booking details first.
                 </p>
             </form>
-        </motion.div>
+        </div>
     )
 }

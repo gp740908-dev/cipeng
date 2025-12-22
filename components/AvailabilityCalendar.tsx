@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isWithinInterval, parseISO, isBefore, startOfDay } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isWithinInterval, parseISO, isBefore, startOfDay } from 'date-fns'
 import { id } from 'date-fns/locale'
 
 interface AvailabilityCalendarProps {
@@ -90,6 +89,7 @@ export default function AvailabilityCalendar({ villaId }: AvailabilityCalendarPr
                     <button
                         onClick={prevMonth}
                         className="p-2 hover:bg-gray-100 transition-colors"
+                        aria-label="Previous month"
                     >
                         <ChevronLeft size={18} className="text-gray-600" />
                     </button>
@@ -99,6 +99,7 @@ export default function AvailabilityCalendar({ villaId }: AvailabilityCalendarPr
                     <button
                         onClick={nextMonth}
                         className="p-2 hover:bg-gray-100 transition-colors"
+                        aria-label="Next month"
                     >
                         <ChevronRight size={18} className="text-gray-600" />
                     </button>
@@ -125,19 +126,18 @@ export default function AvailabilityCalendar({ villaId }: AvailabilityCalendarPr
                         {emptyDays.map((_, index) => (
                             <div key={`empty-${index}`} className="aspect-square" />
                         ))}
-                        {days.map(day => {
+                        {days.map((day, index) => {
                             const isBooked = isDateBooked(day)
                             const status = getBookingStatus(day)
                             const isPast = isPastDate(day)
                             const isToday = isSameDay(day, new Date())
+                            const staggerClass = index < 14 ? `stagger-${(index % 7) + 1}` : ''
 
                             return (
-                                <motion.div
+                                <div
                                     key={day.toISOString()}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
                                     className={`
-                                        aspect-square flex items-center justify-center text-sm relative
+                                        aspect-square flex items-center justify-center text-sm relative animate-scale-in ${staggerClass}
                                         ${isPast ? 'text-gray-300' : 'text-gray-700'}
                                         ${isBooked && status === 'confirmed' ? 'bg-red-100 text-red-700' : ''}
                                         ${isBooked && status === 'pending' ? 'bg-amber-100 text-amber-700' : ''}
@@ -146,7 +146,7 @@ export default function AvailabilityCalendar({ villaId }: AvailabilityCalendarPr
                                     `}
                                 >
                                     {format(day, 'd')}
-                                </motion.div>
+                                </div>
                             )
                         })}
                     </div>

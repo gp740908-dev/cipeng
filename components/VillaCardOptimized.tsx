@@ -1,6 +1,5 @@
 import { memo } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { Villa } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import { ArrowUpRight, Bed, Users, Leaf } from 'lucide-react'
@@ -16,18 +15,14 @@ interface VillaCardProps {
 /**
  * Optimized VillaCard with React.memo to prevent unnecessary re-renders
  * Only re-renders when villa data changes
+ * Uses CSS animations instead of Framer Motion
  */
 const VillaCardOptimized = memo(function VillaCard({ villa, index = 0, featured = false }: VillaCardProps) {
     const prefetchProps = usePrefetchOnHover(`/villas/${villa.id}`)
+    const staggerClass = index < 6 ? `stagger-${index + 1}` : ''
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="group relative"
-        >
+        <div className={`group relative animate-fade-up ${staggerClass}`}>
             <Link
                 href={`/villas/${villa.id}`}
                 className="block"
@@ -97,7 +92,7 @@ const VillaCardOptimized = memo(function VillaCard({ villa, index = 0, featured 
                     </div>
                 </div>
             </Link>
-        </motion.div>
+        </div>
     )
 }, (prevProps, nextProps) => {
     // Custom comparison function

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Villa } from '@/types'
 import VillaCard from '@/components/VillaCard'
@@ -76,11 +75,7 @@ export default function VillasList() {
     return (
         <div className="max-w-[1400px] mx-auto px-6 md:px-12">
             {/* Filter Bar */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between mb-12 pb-6 border-b border-primary/10"
-            >
+            <div className="flex items-center justify-between mb-12 pb-6 border-b border-primary/10 animate-fade-up">
                 <p className="text-muted">
                     {filteredVillas.length} {filteredVillas.length === 1 ? 'property' : 'properties'} available
                 </p>
@@ -103,13 +98,11 @@ export default function VillasList() {
                         <span>Filter</span>
                     </button>
                 </div>
-            </motion.div>
+            </div>
 
-            {/* Filters Panel */}
-            <motion.div
-                initial={false}
-                animate={{ height: showFilters ? 'auto' : 0, opacity: showFilters ? 1 : 0 }}
-                className="overflow-hidden"
+            {/* Filters Panel - CSS transition */}
+            <div
+                className={`overflow-hidden transition-all duration-300 ease-out ${showFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
             >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 pb-12 border-b border-primary/10">
                     <div>
@@ -163,7 +156,7 @@ export default function VillasList() {
                         </select>
                     </div>
                 </div>
-            </motion.div>
+            </div>
 
             {/* Villas Grid */}
             {filteredVillas.length === 0 ? (

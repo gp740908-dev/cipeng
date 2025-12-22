@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import {
     MapPin,
     Waves,
@@ -49,14 +48,12 @@ export default function NearbyPlaces({ places }: NearbyPlacesProps) {
                 {places.map((place, index) => {
                     const Icon = placeIcons[place.type] || placeIcons.other
                     const colorClass = placeColors[place.type] || placeColors.other
+                    const staggerClass = index < 6 ? `stagger-${index + 1}` : ''
 
                     return (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="flex items-center gap-4 p-4 border border-gray-100 hover:border-olive-200 transition-colors"
+                            className={`flex items-center gap-4 p-4 border border-gray-100 hover:border-olive-200 transition-colors animate-fade-up ${staggerClass}`}
                         >
                             <div className={`w-10 h-10 flex items-center justify-center ${colorClass}`}>
                                 <Icon size={18} />
@@ -72,7 +69,7 @@ export default function NearbyPlaces({ places }: NearbyPlacesProps) {
                             <div className="text-olive-600 text-sm font-medium whitespace-nowrap">
                                 {place.distance}
                             </div>
-                        </motion.div>
+                        </div>
                     )
                 })}
             </div>
