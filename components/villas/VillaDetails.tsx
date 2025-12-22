@@ -263,11 +263,9 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                                         className="p-4 sm:p-6 md:p-8 bg-white border border-gray-100 text-center"
                                     >
                                         <stat.icon size={20} className="sm:w-6 sm:h-6 mx-auto text-olive-600 mb-3 sm:mb-4" />
-                                        <CountUp
-                                            end={stat.value}
-                                            duration={2}
-                                            className="font-display text-2xl sm:text-3xl md:text-4xl text-gray-900 block mb-1 sm:mb-2"
-                                        />
+                                        <span className="font-display text-2xl sm:text-3xl md:text-4xl text-gray-900 block mb-1 sm:mb-2">
+                                            {stat.value}
+                                        </span>
                                         <p className="text-gray-500 text-xs sm:text-sm">{stat.label}</p>
                                     </motion.div>
                                 </ScrollReveal>

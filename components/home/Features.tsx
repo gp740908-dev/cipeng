@@ -196,7 +196,7 @@ export default function Features() {
                         ))}
                     </div>
 
-                    {/* Bottom Stats Bar with CountUp */}
+                    {/* Bottom Stats Bar - Static Numbers */}
                     <ScrollReveal delay={0.4}>
                         <div className="mt-20 md:mt-24 py-12 px-8 md:px-16 bg-olive-900 grid grid-cols-2 md:grid-cols-4 gap-8">
                             {stats.map((stat, index) => (

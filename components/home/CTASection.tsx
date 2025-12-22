@@ -170,7 +170,7 @@ export default function CTASection() {
                             </ScrollReveal>
                         </div>
 
-                        {/* Right - Stats Card with CountUp */}
+                        {/* Right - Stats Card - Static Numbers */}
                         <ScrollReveal delay={0.4}>
                             <motion.div
                                 whileHover={{ y: -5 }}
