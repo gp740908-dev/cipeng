@@ -32,14 +32,15 @@ export default function Navbar() {
         const handleScroll = () => {
             const scrollPosition = window.scrollY
 
-            // Add hysteresis to prevent flickering
-            // When scrolling down, need to pass 80px threshold
-            // When scrolling up, need to go below 60px to revert
-            if (scrollPosition > 80 && !isScrolled) {
-                setIsScrolled(true)
-            } else if (scrollPosition < 60 && isScrolled) {
-                setIsScrolled(false)
-            }
+            // Use functional update to avoid stale closure
+            setIsScrolled(currentScrolled => {
+                if (scrollPosition > 80 && !currentScrolled) {
+                    return true
+                } else if (scrollPosition < 60 && currentScrolled) {
+                    return false
+                }
+                return currentScrolled
+            })
         }
 
         // Initial check
@@ -47,7 +48,7 @@ export default function Navbar() {
 
         window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
-    }, [isScrolled])
+    }, [])
 
     useEffect(() => {
         document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset'
@@ -92,11 +93,18 @@ export default function Navbar() {
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], type: 'tween' }}
-                style={{ position: 'fixed', top: 0, left: 0, right: 0, willChange: 'auto' }}
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    willChange: 'auto',
+                    backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.95)' : 'transparent'
+                }}
                 className={`z-[100] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
-                    ${isTransparent
-                        ? 'bg-transparent py-4'
-                        : 'bg-white/95 backdrop-blur-md py-3 border-b border-gray-100 shadow-sm'
+                    ${isScrolled
+                        ? 'backdrop-blur-md py-3 border-b border-gray-100 shadow-sm'
+                        : 'py-4'
                     }
                 `}
             >
