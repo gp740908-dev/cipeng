@@ -236,7 +236,7 @@ export default function Navbar() {
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-12">
                                     <Image
-                                        src="/images/logo-white.png"
+                                        src="/images/logo.png"
                                         alt="StayinUBUD"
                                         width={100}
                                         height={60}

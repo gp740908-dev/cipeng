@@ -38,10 +38,8 @@ export default function PromoBanner({ page = 'home' }: Props) {
                 return
             }
 
-            console.log('Fetched banners:', banners) // Debug
 
             if (!banners || banners.length === 0) {
-                console.log('No banners found')
                 return
             }
 
@@ -54,13 +52,11 @@ export default function PromoBanner({ page = 'home' }: Props) {
                 const isDateValid = validFrom <= nowDate && (!validUntil || validUntil >= nowDate)
                 const isPageValid = !b.show_on_pages || b.show_on_pages.length === 0 || b.show_on_pages.includes(page)
 
-                console.log('Banner:', b.title, 'Date valid:', isDateValid, 'Page valid:', isPageValid) // Debug
 
                 return isDateValid && isPageValid
             })
 
             if (!validBanner) {
-                console.log('No valid banner for this page')
                 return
             }
 
@@ -69,7 +65,6 @@ export default function PromoBanner({ page = 'home' }: Props) {
             const lastShown = localStorage.getItem(storageKey)
 
             if (validBanner.show_frequency === 'once_ever' && lastShown) {
-                console.log('Banner already shown (once_ever)')
                 return
             }
 
@@ -77,17 +72,14 @@ export default function PromoBanner({ page = 'home' }: Props) {
                 const lastDate = new Date(lastShown).toDateString()
                 const today = new Date().toDateString()
                 if (lastDate === today) {
-                    console.log('Banner already shown today')
                     return
                 }
             }
 
             if (validBanner.show_frequency === 'once_per_session' && sessionStorage.getItem(storageKey)) {
-                console.log('Banner already shown this session')
                 return
             }
 
-            console.log('Showing banner:', validBanner.title) // Debug
             setBanner(validBanner)
 
             // Show after delay
