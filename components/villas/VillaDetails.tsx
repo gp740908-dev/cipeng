@@ -104,7 +104,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
     return (
         <>
             {/* Full Screen Hero with Parallax */}
-            <section ref={heroRef} className="relative h-[100svh] min-h-[600px] overflow-hidden -mt-24">
+            <section ref={heroRef} className="relative h-[100svh] min-h-[600px] overflow-hidden -mt-24 w-full">
                 {/* Parallax Background */}
                 <motion.div
                     style={{ y: heroY, scale: heroScale }}
@@ -579,23 +579,23 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                     >
                         <button
                             onClick={() => setShowLightbox(false)}
-                            className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors z-10"
+                            className="absolute top-4 right-4 sm:top-8 sm:right-8 text-white/60 hover:text-white transition-colors z-10"
                         >
-                            <X size={32} />
+                            <X size={28} className="sm:w-8 sm:h-8" />
                         </button>
 
                         <button
                             onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                            className="absolute left-8 top-1/2 -translate-y-1/2 w-14 h-14 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                            className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-14 sm:h-14 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
                         >
-                            <ChevronLeft size={24} />
+                            <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
                         </button>
 
                         <button
                             onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                            className="absolute right-8 top-1/2 -translate-y-1/2 w-14 h-14 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                            className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-14 sm:h-14 border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
                         >
-                            <ChevronRight size={24} />
+                            <ChevronRight size={20} className="sm:w-6 sm:h-6" />
                         </button>
 
                         <motion.div
@@ -603,7 +603,7 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="relative w-full max-w-6xl aspect-[16/10] mx-8"
+                            className="relative w-full max-w-6xl aspect-[16/10] mx-4 sm:mx-8"
                         >
                             <Image
                                 src={villa.images[selectedImage]}
@@ -613,8 +613,8 @@ export default function VillaDetails({ villa }: VillaDetailsProps) {
                             />
                         </motion.div>
 
-                        {/* Thumbnails */}
-                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                        {/* Thumbnails - scrollable on mobile */}
+                        <div className="absolute bottom-8 left-4 right-4 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto flex gap-2 overflow-x-auto pb-2 justify-start sm:justify-center">
                             {villa.images.map((img, index) => (
                                 <button
                                     key={index}

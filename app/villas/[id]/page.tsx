@@ -70,7 +70,7 @@ export default async function VillaPage({ params }: Props) {
     ])
 
     return (
-        <main className="min-h-screen bg-cream">
+        <main className="min-h-screen bg-cream overflow-x-hidden">
             {/* Structured Data - Villa Product */}
             <script
                 type="application/ld+json"
