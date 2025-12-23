@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 // Official WhatsApp Logo SVG Component
 function WhatsAppIcon({ size = 28 }: { size?: number }) {
@@ -19,24 +20,47 @@ function WhatsAppIcon({ size = 28 }: { size?: number }) {
 }
 
 interface WhatsAppButtonProps {
-    phoneNumber?: string
     message?: string
 }
 
+const DEFAULT_WHATSAPP = '6281234567890'
+
 export default function WhatsAppButton({
-    phoneNumber = '6281234567890',
     message = 'Hello, I would like to inquire about your villas.'
 }: WhatsAppButtonProps) {
     const [showTooltip, setShowTooltip] = useState(false)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [phoneNumber, setPhoneNumber] = useState(DEFAULT_WHATSAPP)
 
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    // Fetch WhatsApp number from settings
+    useEffect(() => {
+        async function fetchWhatsAppNumber() {
+            try {
+                const supabase = createClient()
+                const { data } = await supabase
+                    .from('site_settings')
+                    .select('value')
+                    .eq('key', 'contact')
+                    .single()
+
+                if (data?.value?.whatsapp) {
+                    setPhoneNumber(data.value.whatsapp)
+                }
+            } catch (error) {
+                // Use default if fetch fails
+            }
+        }
+
+        fetchWhatsAppNumber()
+    }, [])
 
     // Delay appearance for better perceived performance
     useEffect(() => {
         const timer = setTimeout(() => setIsLoaded(true), 2000)
         return () => clearTimeout(timer)
     }, [])
+
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
     if (!isLoaded) return null
 
@@ -79,4 +103,3 @@ export default function WhatsAppButton({
         </div>
     )
 }
-
