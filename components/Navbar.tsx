@@ -24,39 +24,21 @@ const defaultContact: ContactSettings = {
 
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false)
-    const [showNavbar, setShowNavbar] = useState(true)
-    const [lastScrollY, setLastScrollY] = useState(0)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [contact, setContact] = useState<ContactSettings>(defaultContact)
     const pathname = usePathname()
 
-    // Smart scroll detection
+    // Scroll detection - navbar always visible (fixed), only updates styling
     useEffect(() => {
         const handleScroll = () => {
-            const currentScrollY = window.scrollY
-
-            // Update scrolled state (for styling)
-            setIsScrolled(currentScrollY > 80)
-
-            // Smart navbar visibility
-            if (currentScrollY < 80) {
-                // Always show at top
-                setShowNavbar(true)
-            } else if (currentScrollY > lastScrollY) {
-                // Scrolling DOWN - hide navbar
-                setShowNavbar(false)
-            } else {
-                // Scrolling UP - show navbar
-                setShowNavbar(true)
-            }
-
-            setLastScrollY(currentScrollY)
+            // Update scrolled state (for styling changes only - background, shadow, etc.)
+            setIsScrolled(window.scrollY > 80)
         }
 
         handleScroll() // Initial check
         window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
-    }, [lastScrollY])
+    }, [])
 
     useEffect(() => {
         document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset'
@@ -96,16 +78,13 @@ export default function Navbar() {
 
     return (
         <>
-            {/* Desktop Navbar - Smart hide/show on scroll */}
+            {/* Desktop Navbar - Always Fixed */}
             <motion.nav
                 initial={{ y: -100, opacity: 0 }}
-                animate={{
-                    y: showNavbar ? 0 : -100,  // Hide by sliding up
-                    opacity: showNavbar ? 1 : 0
-                }}
+                animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1], type: 'tween' }}
                 style={{
-                    position: 'fixed',  // FIXED - but hides on scroll down
+                    position: 'fixed',
                     top: 0,
                     left: 0,
                     right: 0,
